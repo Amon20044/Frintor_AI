@@ -51,6 +51,26 @@ export const regStudent = async (student: Student) => {
     return data;
 }
 
+export const logStudent = async (email: string, password: string) => {
+    const { data, error } = await supabase
+        .from("students")
+        .select("*")
+        .eq("email", email)
+        .single();
+
+    if (error) {
+        throw new Error("Student not found");
+    }
+
+    // Verify password
+    const isValidPassword = await argon2.verify(data.password, password);
+    if (!isValidPassword) {
+        throw new Error("Invalid password");
+    }
+
+    return data;
+}
+
 export const onboardStudent = async (student: Student) => {
     const { data, error } = await supabase
         .from("students")
