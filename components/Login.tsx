@@ -82,15 +82,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center py-8">
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-indigo-200/20 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 w-full max-w-md mx-auto">
+    <div className="relative z-10 w-full max-w-md mx-auto">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100 p-8">
           {/* Header */}
           <div className="text-center mb-8">
@@ -179,10 +171,8 @@ export default function LoginForm() {
               <Shield className="h-4 w-4 text-purple-500" />
               <span className="text-sm">Your credentials are secure</span>
             </div>
-            <p className="text-xs">Don’t have an account? Register below</p>
+            <p className="text-xs">Don't have an account? Register below</p>
           </div>
-        </div>
-      </div>
     </div>
   );
 }
