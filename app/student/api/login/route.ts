@@ -11,7 +11,7 @@ async function loginStudent(email: string, password: string) {
       throw new Error('Invalid credentials');
     }
     const token = await jwt({ uuid: response.uuid, email: response.email });
-   
+   console.log({...response})
     return {
       message: 'Student logged in successfully',
       token,
@@ -25,7 +25,7 @@ async function loginStudent(email: string, password: string) {
 export async function POST(req: NextRequest) {
   try {
 
-    console.log('Logging in student with email:', req);
+    console.log('Logging in--------- student with email:', req);
     const { email, password } = await req.json();
     const result = await loginStudent(email, password);
     return NextResponse.json(result, { status: 200 });

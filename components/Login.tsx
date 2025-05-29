@@ -1,13 +1,12 @@
+"use client";
 
-'use client';
-
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginData } from '@/lib/schemas';
-import { Student } from '@/types/student.types';
-import { toast } from 'sonner';
-import { LogIn, AlertCircle, Shield } from 'lucide-react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginData } from "@/lib/schemas";
+import { Student } from "@/types/student.types";
+import { toast } from "sonner";
+import { LogIn, AlertCircle, Shield } from "lucide-react";
 
 export default function LoginForm() {
   const [isPending, setIsPending] = useState(false);
@@ -23,29 +22,29 @@ export default function LoginForm() {
 
   const loginInfo = async (data: LoginData) => {
     try {
-      console.log(data)
-      console.log('Initiating login request with email:', data.email);
-      const res = await fetch('/student/api/login', {
-        method: 'POST',
+      console.log(data);
+      console.log("Initiating login request with email:", data.email);
+      const res = await fetch("/student/api/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
-      console.log('Response from fetch:', res);
-      console.log('Response status:', res.status);
+      console.log("Response from fetch:", res);
+      console.log("Response status:", res.status);
 
       const responseData = await res.json();
-      console.log('Response data:', responseData);
+      console.log("Response data:", responseData);
 
       if (!res.ok) {
-        throw new Error(responseData?.message || 'Login failed');
+        throw new Error(responseData?.message || "Login failed");
       }
 
       const student = responseData.response;
       if (!student) {
-        throw new Error('No student data in response');
+        throw new Error("No student data in response");
       }
 
       const token = responseData.token;
@@ -53,20 +52,21 @@ export default function LoginForm() {
       if (token && uuid) {
         // Set cookies for authentication
         document.cookie = `studentToken=${token}; path=/; max-age=604800; secure; samesite=strict`;
-        localStorage.setItem('token', token);
-        localStorage.setItem('uuid', uuid);
-        console.log('Stored token:', token);
-        console.log('Stored UUID:', uuid);
+        localStorage.setItem("token", token);
+        localStorage.setItem("uuid", uuid);
+        console.log("Stored token:", token);
+        console.log("Stored UUID:", uuid);
       } else {
-        console.warn('Token or UUID missing in response');
+        console.warn("Token or UUID missing in response");
       }
 
-      console.log('Student data:', student);
+      console.log("Student data:", student);
       return student as Student;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Something went wrong';
-      console.error('Error in loginInfo:', message);
-      setError('root', { message });
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
+      console.error("Error in loginInfo:", message);
+      setError("root", { message });
       return null;
     } finally {
       setIsPending(false);
@@ -76,21 +76,21 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginData) => {
     setIsPending(true);
 
-    console.log('Submitting login form');
+    console.log("Submitting login form");
     const student = await loginInfo(data);
 
     if (!student) {
-      console.log('No student data returned, aborting redirection');
+      console.log("No student data returned, aborting redirection");
       return;
     }
-    console.log('Login successful, redirecting student:', student);
-    toast.success('Student logged in successfully');
-    
+    console.log("Login successful, redirecting student:", student);
+    toast.success("Student logged in successfully");
+
     // Use window.location.replace for better navigation
     if (student.onboardingcompleted) {
-      window.location.replace('/student/dashboard');
+      window.location.replace("/student/dashboard");
     } else {
-      window.location.replace('/student/onboarding');
+      window.location.replace("/student/onboarding");
     }
   };
 
@@ -110,23 +110,28 @@ export default function LoginForm() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-transparent bg-clip-text">
             Student Login
           </h1>
-          <p className="text-gray-600 mt-2">Access your account to continue your journey</p>
+          <p className="text-gray-600 mt-2">
+            Access your account to continue your journey
+          </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Email
             </label>
             <input
               id="email"
               type="email"
               placeholder="Enter your email"
-              {...register('email')}
+              {...register("email")}
               className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white/50 transition-all duration-200"
-              aria-invalid={errors.email ? 'true' : 'false'}
-              aria-describedby={errors.email ? 'email-error' : undefined}
+              aria-invalid={errors.email ? "true" : "false"}
+              aria-describedby={errors.email ? "email-error" : undefined}
             />
             {errors.email && (
               <p id="email-error" className="text-red-500 text-sm mt-1">
@@ -135,17 +140,20 @@ export default function LoginForm() {
             )}
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Password
             </label>
             <input
               id="password"
               type="password"
               placeholder="Enter your password"
-              {...register('password')}
+              {...register("password")}
               className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white/50 transition-all duration-200"
-              aria-invalid={errors.password ? 'true' : 'false'}
-              aria-describedby={errors.password ? 'password-error' : undefined}
+              aria-invalid={errors.password ? "true" : "false"}
+              aria-describedby={errors.password ? "password-error" : undefined}
             />
             {errors.password && (
               <p id="password-error" className="text-red-500 text-sm mt-1">
@@ -169,7 +177,7 @@ export default function LoginForm() {
             type="submit"
             disabled={isPending}
             className={`w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white p-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:from-purple-600 hover:to-blue-700 hover:shadow-lg transform hover:scale-105 ${
-              isPending ? 'opacity-50 cursor-not-allowed' : ''
+              isPending ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {isPending ? (
