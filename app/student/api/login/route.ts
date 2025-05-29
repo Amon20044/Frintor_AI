@@ -24,6 +24,8 @@ async function loginStudent(email: string, password: string) {
 
 export async function POST(req: NextRequest) {
   try {
+
+    console.log('Logging in student with email:', req);
     const { email, password } = await req.json();
     const result = await loginStudent(email, password);
     return NextResponse.json(result, { status: 200 });
