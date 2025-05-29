@@ -51,24 +51,24 @@ export const regStudent = async (student: Student) => {
     return data;
 }
 
-export const logStudent = async (email: string, password: string) => {
-    const { data, error } = await supabase
+export const logStudent = async (email: string, password: string): Promise<Student> => {
+    const { data: dataStudent, error: errorLogin } = await supabase
         .from("students")
         .select("*")
         .eq("email", email)
         .single();
 
-    if (error) {
-        throw new Error("Student not found");
+    if (errorLogin) {
+        throw new Error(errorLogin.message);
     }
 
     // Verify password
-    const isValidPassword = await argon2.verify(data.password, password);
-    if (!isValidPassword) {
-        throw new Error("Invalid password");
+    const isValid = await argon2.verify(dataStudent.password, password);
+    if (!isValid) {
+        throw new Error("Invalid credentials");
     }
 
-    return data;
+    return dataStudent;
 }
 
 export const onboardStudent = async (student: Student) => {
@@ -114,26 +114,6 @@ export const getStudentById = async (uuid: string): Promise<Student | null> => {
     }
 
     return data;
-}
-
-export const logStudent = async (email: string, password: string): Promise<Student> => {
-    const { data: dataStudent, error: errorLogin } = await supabase
-        .from("students")
-        .select("*")
-        .eq("email", email)
-        .single();
-
-    if (errorLogin) {
-        throw new Error(errorLogin.message);
-    }
-
-    // Verify password
-    const isValid = await argon2.verify(dataStudent.password, password);
-    if (!isValid) {
-        throw new Error("Invalid credentials");
-    }
-
-    return dataStudent;
 }
 
 export const getAllStudents = async (): Promise<Student[]> => {
