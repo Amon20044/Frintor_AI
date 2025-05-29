@@ -23,6 +23,7 @@ export default function LoginForm() {
 
   const loginInfo = async (data: LoginData) => {
     try {
+      console.log(data)
       console.log('Initiating login request with email:', data.email);
       const res = await fetch('/student/api/login', {
         method: 'POST',
