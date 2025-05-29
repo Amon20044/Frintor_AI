@@ -1,0 +1,31 @@
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  OTHER = 'OTHER',
+}
+
+export enum Level {
+  MID_SCHOOL = 'MID_SCHOOL',
+  HIGH_SCHOOL = 'HIGH_SCHOOL',
+  UNDERGRADUATE = 'UNDERGRADUATE',
+  POSTGRADUATE = 'POSTGRADUATE',
+  WORKING_PROFESSIONAL = 'WORKING_PROFESSIONAL',
+}
+
+export enum AssignedStatus {
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  UNASSIGNED = 'UNASSIGNED',
+}
+
+export enum TestStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+}
+
+export enum SessionStatus {
+  SCHEDULED = 'SCHEDULED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
