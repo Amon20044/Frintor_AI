@@ -1,3 +1,4 @@
+
 import supabase from "../database/db";
 import { Student } from "../types/student.types";
 import argon2 from "argon2";
@@ -16,7 +17,7 @@ export const registerStudent = async (student: Student) => {
     const { data, error } = await supabase
         .from("students")
         .insert({
-            uuid : student.uuid,
+            uuid: student.uuid,
             email: student.email,
             password: student.password
         })
@@ -37,7 +38,8 @@ export const regStudent = async (student: Student) => {
             first_name: student.first_name,
             last_name: student.last_name,
             email: student.email,
-            password: student.password
+            password: student.password,
+            mobile_number: student.mobile_number
         })
         .select()
         .single();
@@ -49,46 +51,99 @@ export const regStudent = async (student: Student) => {
     return data;
 }
 
-export const logStudent = async (email: string, password: string) : Promise<Student>=> {
-    const { data : dataStudent, error : errorLogin } = await supabase
+export const onboardStudent = async (student: Student) => {
+    const { data, error } = await supabase
+        .from("students")
+        .update({
+            age: student.age,
+            dateOfBirth: student.dateofbirth,
+            timeOfBirth: student.timeofbirth,
+            placeOfBirth: student.placeofbirth,
+            gender: student.gender,
+            education: student.education,
+            category: student.category,
+            birth_date: student.birth_date,
+            interest: student.interest,
+            lvl: student.lvl,
+            studentMetadata: student.studentmetadata,
+            preferences: student.preferences_settings,
+            onboardingCompleted: true,
+            updated_at: new Date().toISOString()
+        })
+        .eq('uuid', student.uuid)
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+}
+
+export const getStudentById = async (uuid: string): Promise<Student | null> => {
+    const { data, error } = await supabase
+        .from("students")
+        .select("*")
+        .eq("uuid", uuid)
+        .single();
+
+    if (error) {
+        console.error('Error fetching student:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
+export const logStudent = async (email: string, password: string): Promise<Student> => {
+    const { data: dataStudent, error: errorLogin } = await supabase
         .from("students")
         .select("*")
         .eq("email", email)
         .single();
 
-    if (errorLogin || !dataStudent) {
-        throw new Error("Invalid credentials");
-    }
-    
-    const passwordMatch = await argon2.verify(dataStudent.password, password);
-
-    if (!passwordMatch) {
-        throw new Error("Invalid credentials");
+    if (errorLogin) {
+        throw new Error(errorLogin.message);
     }
 
-    if(errorLogin){
-        throw new Error(errorLogin);
+    // Verify password
+    const isValid = await argon2.verify(dataStudent.password, password);
+    if (!isValid) {
+        throw new Error("Invalid credentials");
     }
+
     return dataStudent;
-};
+}
 
-export const onboardStudent = async (student: Student) => {
-  if (!student.uuid) {
-    throw new Error("UUID is required to update student");
-  }
+export const getAllStudents = async (): Promise<Student[]> => {
+    const { data, error } = await supabase
+        .from("students")
+        .select("*")
+        .eq("is_deleted", false)
+        .order("created_at", { ascending: false });
 
-  // Destructure uuid out to avoid updating it
-  const { uuid, ...rest } = student;
+    if (error) {
+        throw new Error(error.message);
+    }
 
-  const { data, error } = await supabase
-    .from("students")
-    .update({ ...rest, birth_date : rest.dateofbirth }) // update with all fields except uuid
-    .eq("uuid", uuid)
-    .select(); // optional: returns the updated row(s)
+    return data || [];
+}
 
-  if (error) {
-    throw new Error(error.message);
-  }
+export const updateStudent = async (uuid: string, updates: Partial<Student>) => {
+    const { data, error } = await supabase
+        .from("students")
+        .update({
+            ...updates,
+            updated_at: new Date().toISOString()
+        })
+        .eq('uuid', uuid)
+        .select()
+        .single();
 
-  return data;
-};
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+}
