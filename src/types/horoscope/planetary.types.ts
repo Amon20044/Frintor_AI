@@ -11,7 +11,7 @@ export interface PlanetaryInfluence {
 }
 
 // Planetary icon mapping
-export interface PlanetIconMap {
+export type PlanetIconMap = {
   [key in Planet]: string;
 }
 

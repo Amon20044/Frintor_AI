@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error('Error in route:', error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return NextResponse.json(
       { message: 'Invalid credentials', error: error instanceof Error ? error.message : 'Unknown error' }, 
       { status: 401 }
