@@ -9,6 +9,7 @@ interface Student {
   email: string;
   mobile_number: string;
   password: string;
+  final_pass: string;
 }
 
 interface Mentor {
@@ -35,7 +36,8 @@ export default function DevCrudPanel() {
     last_name: '',
     email: '',
     mobile_number: '',
-    password: ''
+    password: '',
+    final_pass: ''
   });
 
   const [mentorData, setMentorData] = useState<Mentor>({
@@ -64,7 +66,7 @@ export default function DevCrudPanel() {
       
       if (response.ok) {
         setMessage({ type: 'success', text: 'Student added successfully!' });
-        setStudentData({ first_name: '', last_name: '', email: '', mobile_number: '', password: '' });
+        setStudentData({ first_name: '', last_name: '', email: '', mobile_number: '', password: '', final_pass: '' });
       } else {
         setMessage({ type: 'error', text: 'Failed to add student' });
       }
@@ -218,7 +220,15 @@ export default function DevCrudPanel() {
                 placeholder="Password"
                 value={studentData.password}
                 onChange={(e) => setStudentData({ ...studentData, password: e.target.value })}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 md:col-span-2"
+                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={studentData.final_pass}
+                onChange={(e) => setStudentData({ ...studentData, final_pass: e.target.value })}
+                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                 required
               />
             </div>
@@ -303,7 +313,7 @@ export default function DevCrudPanel() {
               />
               <input
                 type="text"
-                placeholder="User ID"
+                placeholder="User ID (for login)"
                 value={adminData.user_id}
                 onChange={(e) => setAdminData({ ...adminData, user_id: e.target.value })}
                 className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"

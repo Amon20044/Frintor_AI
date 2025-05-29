@@ -1,8 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getMentorByEmail } from '@/models/mentorModel';
-import { verifyPassword } from '@/utils/generateHash';
 import { jwt } from '@/utils/signJwt';
+import * as argon2 from 'argon2';
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isValidPassword = await verifyPassword(password, mentor.password);
+    // Verify password
+    const isValidPassword = await argon2.verify(mentor.password, password);
     if (!isValidPassword) {
       return NextResponse.json(
         { message: 'Invalid credentials' },
@@ -41,8 +42,8 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Error in mentor login:', error);
     return NextResponse.json(
-      { message: 'Internal server error', error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      { message: 'Invalid credentials', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 401 }
     );
   }
 }
