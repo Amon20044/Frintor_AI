@@ -1,4 +1,20 @@
 
+// Forward declarations
+export interface PlanetaryInfluence {
+  house: HouseNumber;
+  planet: Planet;
+  analysis_of_effect: string;
+  strength?: 'weak' | 'moderate' | 'strong';
+  benefic?: boolean;
+}
+
+export interface CareerPath {
+  career: string;
+  colleges: any[];
+  match_percentage?: number;
+  reasoning?: string;
+}
+
 // Base interface for database entity
 export interface AiHoroscope {
   uuid: string;

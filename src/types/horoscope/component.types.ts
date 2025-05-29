@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { HoroscopeData, ZodiacSign } from './base.types';
+import { HoroscopeData, ZodiacSign, Planet } from './base.types';
 import { College } from './career.types';
 
 // Component props interface
@@ -56,4 +56,15 @@ export const DEFAULT_ZODIAC_ICONS: ZodiacIconMap = {
   'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊', 'Cancer': '♋',
   'Leo': '♌', 'Virgo': '♍', 'Libra': '♎', 'Scorpio': '♏',
   'Sagittarius': '♐', 'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓'
+};
+
+// Planet icon mapping
+export interface PlanetIconMap {
+  [key in Planet]: string;
+}
+
+export const DEFAULT_PLANET_ICONS: PlanetIconMap = {
+  'Sun': '☉', 'Moon': '☽', 'Mars': '♂', 'Mercury': '☿', 
+  'Jupiter': '♃', 'Venus': '♀', 'Saturn': '♄',
+  'Rahu': '☊', 'Ketu': '☋', 'Uranus': '♅', 'Neptune': '♆', 'Pluto': '♇'
 };

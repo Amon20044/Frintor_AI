@@ -1,6 +1,6 @@
 
 import { ZodiacSign, Planet } from '@/src/types/horoscope';
-import { DEFAULT_ZODIAC_ICONS, DEFAULT_PLANET_ICONS } from '@/src/types/horoscope';
+import { DEFAULT_ZODIAC_ICONS, DEFAULT_PLANET_ICONS } from '@/src/types/horoscope/component.types';
 
 // Get zodiac icon
 export const getZodiacIcon = (sign: ZodiacSign): string => {
