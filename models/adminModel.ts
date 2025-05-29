@@ -1,48 +1,71 @@
+import { supabase } from '@/database/db';
 
-import supabase from "../database/db";
-import { Admin } from "../types/admin.types";
-import argon2 from "argon2";
-
-export const createAdmin = async (admin: Omit<Admin, 'uuid' | 'created_at' | 'updated_at'>) => {
-    const hashedPassword = await argon2.hash(admin.password);
-    
-    const { data, error } = await supabase
-        .from("admin")
-        .insert({
-            user_id: admin.user_id,
-            name: admin.name,
-            mobile_number: admin.mobile_number,
-            password: hashedPassword
-        })
-        .select()
-        .single();
-
-    if (error) {
-        throw new Error(error.message);
-    }
-
-    return data;
+export interface Admin {
+  uuid: string;
+  user_id: string;
+  name: string;
+  mobile_number?: string;
+  password: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export const loginAdmin = async (userId: string, password: string): Promise<Admin> => {
-    const { data, error } = await supabase
-        .from("admin")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("is_deleted", false)
-        .single();
+export const getAdminByUserId = async (userId: string): Promise<Admin | null> => {
+  const { data, error } = await supabase
+    .from('admin')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
 
-    if (error) {
-        throw new Error("Invalid credentials");
-    }
+  if (error) {
+    console.error('Error fetching admin by user ID:', error.message);
+    return null;
+  }
 
-    const isValid = await argon2.verify(data.password, password);
-    if (!isValid) {
-        throw new Error("Invalid credentials");
-    }
+  return data;
+};
 
-    return data;
-}
+export const createAdmin = async (adminData: Omit<Admin, 'uuid' | 'created_at' | 'updated_at'>) => {
+  const { data, error } = await supabase
+    .from('admin')
+    .insert(adminData)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const updateAdmin = async (uuid: string, updates: Partial<Admin>) => {
+  const { data, error } = await supabase
+    .from('admin')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('uuid', uuid)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const getAllAdmins = async (): Promise<Admin[]> => {
+  const { data, error } = await supabase
+    .from('admin')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
 
 export const getAdminById = async (uuid: string): Promise<Admin | null> => {
     const { data, error } = await supabase
@@ -58,7 +81,7 @@ export const getAdminById = async (uuid: string): Promise<Admin | null> => {
     }
 
     return data;
-}
+};
 
 export const getAllStudentsForAdmin = async () => {
     const { data, error } = await supabase
@@ -88,7 +111,7 @@ export const getAllStudentsForAdmin = async () => {
     }
 
     return data || [];
-}
+};
 
 export const getDashboardStats = async () => {
     // Get total students
@@ -123,4 +146,4 @@ export const getDashboardStats = async () => {
         completedTests: completedTests || 0,
         activeMentorships: activeMentorships || 0
     };
-}
+};

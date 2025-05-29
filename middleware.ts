@@ -1,0 +1,54 @@
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Public routes that don't require authentication
+  const publicRoutes = ['/', '/student/auth', '/mentor/auth', '/admin/auth'];
+  
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
+  }
+
+  // Check for authentication tokens based on route
+  let token = null;
+  let redirectPath = '/';
+
+  if (pathname.startsWith('/student')) {
+    token = request.cookies.get('studentToken')?.value || 
+            request.headers.get('authorization')?.split(' ')[1];
+    redirectPath = '/student/auth';
+  } else if (pathname.startsWith('/mentor')) {
+    token = request.cookies.get('mentorToken')?.value ||
+            request.headers.get('authorization')?.split(' ')[1];
+    redirectPath = '/mentor/auth';
+  } else if (pathname.startsWith('/admin')) {
+    token = request.cookies.get('adminToken')?.value ||
+            request.headers.get('authorization')?.split(' ')[1];
+    redirectPath = '/admin/auth';
+  }
+
+  if (!token) {
+    return NextResponse.redirect(new URL(redirectPath, request.url));
+  }
+
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_TOKEN_SECRET!);
+    await jwtVerify(token, secret);
+    return NextResponse.next();
+  } catch (error) {
+    console.error('JWT verification failed:', error);
+    return NextResponse.redirect(new URL(redirectPath, request.url));
+  }
+}
+
+export const config = {
+  matcher: [
+    '/student/:path*',
+    '/mentor/:path*',
+    '/admin/:path*',
+  ],
+};

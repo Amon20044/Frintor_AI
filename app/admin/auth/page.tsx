@@ -2,17 +2,24 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, type LoginData } from '@/lib/schemas';
 import { LogIn, ArrowLeft, Shield, AlertCircle } from 'lucide-react';
 
 export default function AdminAuth() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isPending, setIsPending] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginData) => {
     setIsPending(true);
 
     try {
@@ -21,28 +28,29 @@ export default function AdminAuth() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(data),
       });
 
-      const data = await res.json();
+      const responseData = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.message || 'Login failed');
+        throw new Error(responseData?.message || 'Login failed');
       }
 
-      const admin = data.response;
-      const token = data.token;
+      const admin = responseData.response;
+      const token = responseData.token;
       const uuid = admin.uuid;
 
       if (token && uuid) {
+        document.cookie = `adminToken=${token}; path=/; max-age=604800; secure; samesite=strict`;
         localStorage.setItem('adminToken', token);
         localStorage.setItem('adminUuid', uuid);
       }
 
-      window.location.href = '/admin/dashboard';
+      window.location.replace('/admin/dashboard');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong';
-      setError(message);
+      setError('root', { message });
     } finally {
       setIsPending(false);
     }
@@ -85,7 +93,7 @@ export default function AdminAuth() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -94,11 +102,12 @@ export default function AdminAuth() {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register('email')}
                 className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-500 bg-white/50 transition-all duration-200"
-                required
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
@@ -108,18 +117,19 @@ export default function AdminAuth() {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register('password')}
                 className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-500 bg-white/50 transition-all duration-200"
-                required
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              )}
             </div>
 
             {/* Error Message */}
-            {error && (
+            {errors.root && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                <p className="text-red-700 text-sm font-medium">{error}</p>
+                <p className="text-red-700 text-sm font-medium">{errors.root.message}</p>
               </div>
             )}
 
