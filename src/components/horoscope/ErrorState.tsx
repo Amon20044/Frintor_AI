@@ -12,7 +12,9 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
       <div className="text-center bg-white p-8 rounded-xl shadow-lg border border-red-200">
         <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Unable to Load Horoscope</h3>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">AI is Generating Horoscope based!!!</h2>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">So unable to Load Horoscope</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">may take minutes...</h3>
         <p className="text-gray-600 mb-4">{error}</p>
         {onRetry && (
           <button 
