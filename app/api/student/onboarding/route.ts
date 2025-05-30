@@ -29,9 +29,9 @@ export async function POST(req: NextRequest) {
       last_name,
       age,
       gender,
-      dateOfBirth,
-      timeOfBirth,
-      placeOfBirth,
+      dateofbirth,
+      timeofbirth,
+      placeofbirth,
       email,
       mobile_number,
       category,
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       // Preferences for preferences jsonb
       preferences,
       career_goals,
-      
+      onboardingcompleted,
       ...rest
     } = body;
 
@@ -82,14 +82,14 @@ export async function POST(req: NextRequest) {
 
     // Organize data according to JSON structure
     const studentData = {
-      uuid: studentIdFromToken,
+      student_id: studentIdFromToken,
       first_name,
       last_name,
       age,
       gender,
-      dateOfBirth,
-      timeOfBirth,
-      placeOfBirth,
+      dateofbirth,
+      timeofbirth,
+      placeofbirth,
       email,
       mobile_number,
       category,
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
         pg_cgpa_cpi,
         pg_graduation_year
       },
-      studentMetadata: {
+      studentmetadata: {
         permanent_address,
         current_address,
         full_parents_details: {
@@ -132,7 +132,8 @@ export async function POST(req: NextRequest) {
       preferences: {
         preferences,
         career_goals
-      }
+      },
+      onboardingcompleted: true,
     };
 
     const result = await onboardStudent(studentData);
