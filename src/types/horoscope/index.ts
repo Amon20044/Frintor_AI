@@ -10,6 +10,9 @@ export {
 // Career and college types - explicitly re-export to avoid conflicts
 export {
   type CareerPath as CareerPathDetails,
+  type CareerPathSummary,
+  type College,
+  type CollegeFilter,
   // Add other types from career.types here, renaming as needed
 } from './career.types';
 
