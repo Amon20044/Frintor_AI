@@ -40,21 +40,33 @@ export async function POST(req: NextRequest) {
       
       // Academic details for education jsonb
       tenth_percentage,
+      tenth_year,
       twelfth_percentage,
+      twelfth_year,
       academic_background,
       subject,
-      tenth_marksheet,
-      twelfth_marksheet,
       other_certificate,
-      neet_marksheet,
+      competitive_exams,
+      institute,
+      branch,
+      cgpa_cpi,
+      graduation_year,
+      pg_institute,
+      pg_branch,
+      pg_cgpa_cpi,
+      pg_graduation_year,
+      
+      // Professional experience
+      company_name,
+      job_title,
+      experience_years,
+      current_salary,
       
       // Metadata for studentMetadata jsonb
       permanent_address,
       current_address,
       father_name,
       mother_name,
-      father_birth_date,
-      mother_birth_date,
       father_contact,
       mother_contact,
       
@@ -67,9 +79,6 @@ export async function POST(req: NextRequest) {
 
     // Process interests into array
     const interestArray = interest ? interest.split(',').map((i: string) => i.trim()) : [];
-
-    // Split interests into array
-    const interestArray = interest ? interest.split(',').map(i => i.trim()) : [];
 
     // Organize data according to JSON structure
     const studentData = {
@@ -88,17 +97,21 @@ export async function POST(req: NextRequest) {
       interest: interestArray,
       education: {
         tenth_percentage,
+        tenth_year,
         twelfth_percentage,
+        twelfth_year,
         academic_background,
         subject,
-        tenth_marksheet,
-        twelfth_marksheet,
         other_certificate,
-        neet_marksheet,
+        competitive_exams,
         institute,
         branch,
         cgpa_cpi,
-        graduation_year
+        graduation_year,
+        pg_institute,
+        pg_branch,
+        pg_cgpa_cpi,
+        pg_graduation_year
       },
       studentMetadata: {
         permanent_address,
@@ -106,8 +119,6 @@ export async function POST(req: NextRequest) {
         full_parents_details: {
           father_name,
           mother_name,
-          father_birth_date,
-          mother_birth_date,
           father_contact,
           mother_contact
         },

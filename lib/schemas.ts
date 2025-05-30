@@ -45,21 +45,30 @@ export const onboardingSchema = z.object({
   lvl: z.enum(["MID_SCHOOL", "HIGH_SCHOOL", "UNDERGRADUATE", "POSTGRADUATE", "WORKING_PROFESSIONAL"], {
     required_error: "Education level is required",
   }),
+  
+  // Basic Academic Info
   tenth_percentage: z.string().optional(),
+  tenth_year: z.string().optional(),
   twelfth_percentage: z.string().optional(),
+  twelfth_year: z.string().optional(),
   academic_background: z.string().optional(),
   subject: z.string().optional(),
-  tenth_marksheet: z.string().optional(),
-  twelfth_marksheet: z.string().optional(),
   other_certificate: z.string().optional(),
-  neet_marksheet: z.string().optional(),
-  // Optional Academic Fields
+  competitive_exams: z.string().optional(),
+  
+  // Higher Education Fields (UG/PG)
   institute: z.string().optional(),
   branch: z.string().optional(),
   cgpa_cpi: z.string().optional(),
   graduation_year: z.string().optional(),
+  
+  // Postgraduate specific
+  pg_institute: z.string().optional(),
+  pg_branch: z.string().optional(),
+  pg_cgpa_cpi: z.string().optional(),
+  pg_graduation_year: z.string().optional(),
 
-  // Professional Section (Optional)
+  // Professional Section (Working Professional)
   company_name: z.string().optional(),
   job_title: z.string().optional(),
   experience_years: z.string().optional(),
@@ -70,11 +79,9 @@ export const onboardingSchema = z.object({
   preferences: z.string().optional(),
   career_goals: z.string().optional(),
 
-  // Parent's Details
+  // Parent's Details (simplified)
   father_name: z.string().optional(),
   mother_name: z.string().optional(),
-  father_birth_date: z.string().optional(),
-  mother_birth_date: z.string().optional(),
   father_contact: z.string().optional(),
   mother_contact: z.string().optional(),
 });
