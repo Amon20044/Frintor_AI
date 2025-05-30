@@ -1,11 +1,10 @@
+"use client";
 
-'use client';
-
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginData } from '@/lib/schemas';
-import { LogIn, ArrowLeft, UserCheck, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginData } from "@/lib/schemas";
+import { LogIn, ArrowLeft, UserCheck, AlertCircle } from "lucide-react";
 
 export default function MentorAuth() {
   const [isPending, setIsPending] = useState(false);
@@ -23,10 +22,10 @@ export default function MentorAuth() {
     setIsPending(true);
 
     try {
-      const res = await fetch('/mentor/api/login', {
-        method: 'POST',
+      const res = await fetch("/api/mentor/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
@@ -34,7 +33,7 @@ export default function MentorAuth() {
       const responseData = await res.json();
 
       if (!res.ok) {
-        throw new Error(responseData?.message || 'Login failed');
+        throw new Error(responseData?.message || "Login failed");
       }
 
       const mentor = responseData.response;
@@ -43,14 +42,15 @@ export default function MentorAuth() {
 
       if (token && uuid) {
         document.cookie = `mentorToken=${token}; path=/; max-age=604800; secure; samesite=strict`;
-        localStorage.setItem('mentorToken', token);
-        localStorage.setItem('mentorUuid', uuid);
+        localStorage.setItem("mentorToken", token);
+        localStorage.setItem("mentorUuid", uuid);
       }
 
-      window.location.replace('/mentor/dashboard');
+      window.location.replace("/mentor/dashboard");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Something went wrong';
-      setError('root', { message });
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
+      setError("root", { message });
     } finally {
       setIsPending(false);
     }
@@ -67,7 +67,7 @@ export default function MentorAuth() {
 
       {/* Back button */}
       <button
-        onClick={() => window.location.href = '/'}
+        onClick={() => (window.location.href = "/")}
         className="absolute top-6 left-6 z-20 flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
       >
         <ArrowLeft className="h-5 w-5" />
@@ -89,39 +89,54 @@ export default function MentorAuth() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-blue-600 text-transparent bg-clip-text">
               Mentor Login
             </h1>
-            <p className="text-gray-600 mt-2">Access your mentoring dashboard</p>
+            <p className="text-gray-600 mt-2">
+              Access your mentoring dashboard
+            </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email
               </label>
               <input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                {...register('email')}
+                {...register("email")}
                 className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:ring-2 focus:ring-green-500 bg-white/50 transition-all duration-200"
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Password
               </label>
               <input
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                {...register('password')}
+                {...register("password")}
                 className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:ring-2 focus:ring-green-500 bg-white/50 transition-all duration-200"
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -129,7 +144,9 @@ export default function MentorAuth() {
             {errors.root && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                <p className="text-red-700 text-sm font-medium">{errors.root.message}</p>
+                <p className="text-red-700 text-sm font-medium">
+                  {errors.root.message}
+                </p>
               </div>
             )}
 
@@ -138,7 +155,7 @@ export default function MentorAuth() {
               type="submit"
               disabled={isPending}
               className={`w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:from-green-600 hover:to-emerald-700 hover:shadow-lg transform hover:scale-105 ${
-                isPending ? 'opacity-50 cursor-not-allowed' : ''
+                isPending ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {isPending ? (
@@ -157,7 +174,9 @@ export default function MentorAuth() {
 
           {/* Footer */}
           <div className="text-center mt-6 text-gray-600">
-            <p className="text-sm">Don&apos;t have an account? Contact administration</p>
+            <p className="text-sm">
+              Don&apos;t have an account? Contact administration
+            </p>
           </div>
         </div>
       </div>
