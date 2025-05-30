@@ -1,13 +1,34 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginForm from '@/components/Login';
 import RegisterForm from '@/components/Register';
 import { LogIn, UserPlus, ArrowLeft } from 'lucide-react';
 
 export default function StudentAuth() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+
+  useEffect(() => {
+    const postData = async () => {
+      try {
+        const res = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name: 'Amon' })
+        });
+
+        const data = await res.json();
+        console.log('Response:', data);
+      } catch (error) {
+        console.error('Fetch Error:', error);
+      }
+    };
+
+    postData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
@@ -39,11 +60,10 @@ export default function StudentAuth() {
           <div className="flex border-b border-purple-200">
             <button
               onClick={() => setActiveTab('login')}
-              className={`flex-1 p-4 text-center font-semibold transition-all duration-200 ${
-                activeTab === 'login'
-                  ? 'bg-gradient-to-r from-purple-50 to-blue-50 text-purple-900 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:bg-purple-50/30'
-              }`}
+              className={`flex-1 p-4 text-center font-semibold transition-all duration-200 ${activeTab === 'login'
+                ? 'bg-gradient-to-r from-purple-50 to-blue-50 text-purple-900 border-b-2 border-purple-600'
+                : 'text-gray-600 hover:bg-purple-50/30'
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <LogIn className="h-5 w-5" />
@@ -52,11 +72,10 @@ export default function StudentAuth() {
             </button>
             <button
               onClick={() => setActiveTab('register')}
-              className={`flex-1 p-4 text-center font-semibold transition-all duration-200 ${
-                activeTab === 'register'
-                  ? 'bg-gradient-to-r from-purple-50 to-blue-50 text-purple-900 border-b-2 border-purple-600'
-                  : 'text-gray-600 hover:bg-purple-50/30'
-              }`}
+              className={`flex-1 p-4 text-center font-semibold transition-all duration-200 ${activeTab === 'register'
+                ? 'bg-gradient-to-r from-purple-50 to-blue-50 text-purple-900 border-b-2 border-purple-600'
+                : 'text-gray-600 hover:bg-purple-50/30'
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <UserPlus className="h-5 w-5" />

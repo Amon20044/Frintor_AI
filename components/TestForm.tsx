@@ -25,7 +25,7 @@ export default function TestForm({ params }: { params: { uuid: string } }) {
     const fetchTest = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/student/api/getTest/${params.uuid}`, {
+        const res = await fetch(`api/student/getTest/${params.uuid}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ export default function TestForm({ params }: { params: { uuid: string } }) {
     };
     console.log('Submitting test result:', resultPayload);
     try {
-      const res = await fetch(`/student/api/addStudentResponse/${testId}`, {
+      const res = await fetch(`api/student/addStudentResponse/${testId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

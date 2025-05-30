@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler, SubmitErrorHandler} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterData } from '@/lib/schemas';
 import { Student } from '@/types/student.types';
@@ -51,21 +51,29 @@ export default function RegisterForm() {
       return null;
     }
   };
-
-  const onSubmit = async (data: RegisterData) => {
+  const onError: SubmitErrorHandler<RegisterData> = (errors) => console.log(errors)
+  const onSubmit: SubmitHandler<RegisterData> = async (data: RegisterData) => {
     setIsPending(true);
     console.log('Submitting registration form:', data);
-    const student = await registerStudent(data);
 
-    if (!student) {
-      console.log('No student data returned, aborting redirection');
+    try {
+      const student = await registerStudent(data);
+
+      if (!student) {
+        console.log('No student data returned, aborting redirection');
+        setIsPending(false);
+        return; // Just return to stop execution
+      }
+
+      toast.success('Registration successful! Please login to continue.');
+      console.log('Registration successful, redirecting to login');
+      window.location.replace('/student/auth');
+    } catch (error) {
+      console.error('Registration failed:', error);
+      toast.error('Something went wrong during registration.');
+    } finally {
       setIsPending(false);
-      return;
     }
-    toast.success('Registration successful! Please login to continue.');
-    console.log('Registration successful, redirecting to login');
-    window.location.replace('/student/auth');
-    setIsPending(false);
   };
 
   return (
@@ -87,7 +95,7 @@ export default function RegisterForm() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col gap-4">
         <div>
           <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
             First Name
@@ -217,9 +225,8 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={isPending}
-          className={`w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white p-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:from-purple-600 hover:to-blue-700 hover:shadow-lg transform hover:scale-105 ${
-            isPending ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          className={`w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white p-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:from-purple-600 hover:to-blue-700 hover:shadow-lg transform hover:scale-105 ${isPending ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
         >
           {isPending ? (
             <>

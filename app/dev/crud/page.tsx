@@ -79,6 +79,7 @@ export default function DevCrudPanel() {
 
   const handleMentorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submitting mentor data:', mentorData);
     setLoading(true);
     try {
       const response = await fetch('/mentor/api/register', {

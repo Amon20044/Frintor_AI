@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Clock, CheckCircle, AlertCircle, Eye, Lock, BookOpen, Play } from 'lucide-react';
-import { TestForm } from '@/components/TestForm';
+import { Clock, CheckCircle, Eye, Lock, BookOpen, Play } from 'lucide-react';
+import TestForm from '@/components/TestForm';
 
 interface TestStatus {
   uuid: string;
@@ -26,35 +26,38 @@ export default function StudentTestPage() {
   const [canViewResults, setCanViewResults] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showTest, setShowTest] = useState(false);
-  const [studentId, setStudentId] = useState<string | null>(null);
+  const [studentId, setStudentId] = useState<string>(''); // start empty
 
   useEffect(() => {
-    // In a real app, get this from auth context
-    const mockStudentId = "student-uuid-1"; // Replace with actual auth
-    setStudentId(mockStudentId);
-    checkTestStatus(mockStudentId);
+    const uuid = localStorage.getItem('uuid');
+    if (uuid) {
+      console.log('Student ID:', uuid);
+      setStudentId(uuid);
+      checkTestStatus(uuid); // call with correct value
+    }
   }, []);
 
   const checkTestStatus = async (studentId: string) => {
     try {
       setLoading(true);
-      
+
       // Check test status
-      const statusRes = await fetch(`/student/api/test-status/${studentId}`);
+      const statusRes = await fetch(`/api/student/test-status/${studentId}`);
       if (statusRes.ok) {
         const statusData = await statusRes.json();
         setTestStatus(statusData.test);
-        
+
         // If test is completed, check if student can view results
         if (statusData.test && statusData.test.status === 'COMPLETED') {
-          const resultAccessRes = await fetch(`/student/api/can-view-results/${studentId}`);
+          const resultAccessRes = await fetch(`/api/student/can-view-results/${studentId}`);
+          console.log('Checking if student can view results:', resultAccessRes);
           if (resultAccessRes.ok) {
             const accessData = await resultAccessRes.json();
             setCanViewResults(accessData.canView);
-            
+
             // If they can view results, fetch them
             if (accessData.canView) {
-              const resultsRes = await fetch(`/student/api/test-results/${studentId}`);
+              const resultsRes = await fetch(`api/student/test-results/${studentId}`);
               if (resultsRes.ok) {
                 const resultsData = await resultsRes.json();
                 setTestResults(resultsData.results);
@@ -197,7 +200,7 @@ export default function StudentTestPage() {
                     <Eye className="h-6 w-6 text-blue-600" />
                     <h3 className="text-xl font-bold text-gray-800">Your Results</h3>
                   </div>
-                  
+
                   {testResults ? (
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -212,7 +215,7 @@ export default function StudentTestPage() {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-4">
                         <h4 className="font-semibold text-gray-800">Detailed Analysis</h4>
                         <div className="bg-gray-50 p-6 rounded-xl">
@@ -247,13 +250,13 @@ export default function StudentTestPage() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-4">Results Under Review</h3>
                     <p className="text-gray-600 mb-6">
-                      Your mentor is reviewing your assessment results. You'll be able to view detailed insights 
+                      Your mentor is reviewing your assessment results. You`ll be able to view detailed insights
                       after your mentoring session is completed.
                     </p>
                     <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
                       <p className="text-orange-700 text-sm">
-                        💡 <strong>Next Steps:</strong> Wait for your mentor to schedule a session with you. 
-                        You'll receive detailed guidance and unlock your full results after the session.
+                        💡 <strong>Next Steps:</strong> Wait for your mentor to schedule a session with you.
+                        You`ll receive detailed guidance and unlock your full results after the session.
                       </p>
                     </div>
                   </div>

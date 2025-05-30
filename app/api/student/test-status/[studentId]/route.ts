@@ -1,11 +1,12 @@
 
+'use server';
 import { NextRequest, NextResponse } from 'next/server';
 import { getStudentTestStatus } from '@/models/testModel';
 
 export async function GET(req: NextRequest, { params }: { params: { studentId: string } }) {
+  console.log('Fetching test status for studentId:', params.studentId);
   try {
     const { studentId } = params;
-    
     if (!studentId) {
       return NextResponse.json(
         { message: 'Student ID is required' },

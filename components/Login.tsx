@@ -24,7 +24,7 @@ export default function LoginForm() {
     try {
       console.log(data);
       console.log("Initiating login request with email:", data.email);
-      const res = await fetch("/student/api/login", {
+      const res = await fetch("/api/student/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export default function LoginForm() {
         throw new Error(responseData?.message || "Login failed");
       }
 
-      const student = responseData.response;
+      const student = responseData.student;
       if (!student) {
         throw new Error("No student data in response");
       }

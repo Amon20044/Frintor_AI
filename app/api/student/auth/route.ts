@@ -8,7 +8,14 @@ import { genHash } from '@/utils/generateHash';
 export async function POST(req: NextRequest) {
   try {
     const { first_name, last_name, mobile_number, email, password, final_pass } = await req.json();
-    
+    console.log('Received data:', {
+      first_name,
+      last_name,
+      mobile_number,
+      email,
+      password,
+      final_pass,
+    });
     // 1. Validate required fields
     if (!first_name || !last_name || !mobile_number || !email || !password || !final_pass) {
       return NextResponse.json(
@@ -39,6 +46,9 @@ export async function POST(req: NextRequest) {
 
     // 5. Sign up (e.g., with Supabase auth) and save in DB
     const result = await signUp(email, password);
+
+    console.log('Sign up result:', result);
+
     const response = await regStudent(student);
 
     return NextResponse.json(
