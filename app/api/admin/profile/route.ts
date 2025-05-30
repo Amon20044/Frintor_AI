@@ -1,7 +1,6 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/middleware/authMiddleware";
-import { supabase } from "@/database/db";
+import supabase from "@/database/db";
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,7 +8,7 @@ export async function GET(req: NextRequest) {
     if (!tokenVerification.valid) {
       return NextResponse.json(
         { success: false, message: "Invalid token" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -24,19 +23,19 @@ export async function GET(req: NextRequest) {
     if (error || !admin) {
       return NextResponse.json(
         { success: false, message: "Admin not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json({
       success: true,
-      admin
+      admin,
     });
   } catch (error) {
     console.error("Error fetching admin profile:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
