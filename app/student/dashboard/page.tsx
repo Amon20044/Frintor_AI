@@ -76,7 +76,7 @@ function Page() {
         setStudent(data.student);
 
         // Fetch mentor assignment status
-        await fetchMentorAssignment(data.student.uuid);
+        await fetchAssignedMentor(data.student.uuid);
 
         // Fetch horoscope verification status
         await fetchHoroscopeStatus(data.student.uuid);
