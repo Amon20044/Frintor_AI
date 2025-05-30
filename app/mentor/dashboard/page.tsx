@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -73,10 +72,10 @@ export default function MentorDashboard() {
       if (response.ok) {
         const data = await response.json();
         setMentor(data.mentor);
-        
+
         // Fetch assigned students using mentor UUID
         await fetchAssignedStudents(data.mentor.uuid);
-        
+
         toast.success(`Welcome ${data.mentor.mentor_name}! Ready to guide your students?`);
       } else {
         window.location.href = '/mentor/auth';
@@ -94,7 +93,7 @@ export default function MentorDashboard() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setAssignedStudents(data.students || []);
@@ -115,7 +114,7 @@ export default function MentorDashboard() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('mentorToken')}`
         },
         body: JSON.stringify({ studentId, mentorId: mentor?.uuid })
       });
@@ -141,7 +140,7 @@ export default function MentorDashboard() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('mentorToken')}`
         },
         body: JSON.stringify({ assignmentId })
       });
@@ -352,7 +351,7 @@ export default function MentorDashboard() {
                           </button>
                         </div>
                       )}
-                      
+
                       <button
                         onClick={() => verifyHoroscope(assignment.student.uuid)}
                         className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
