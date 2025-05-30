@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginData } from "@/lib/schemas";
+import { z } from "zod";
+
+const mentorLoginSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type MentorLoginData = z.infer<typeof mentorLoginSchema>;
 import { LogIn, ArrowLeft, UserCheck, AlertCircle } from "lucide-react";
 
 export default function MentorAuth() {
@@ -14,11 +21,11 @@ export default function MentorAuth() {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<LoginData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<MentorLoginData>({
+    resolver: zodResolver(mentorLoginSchema),
   });
 
-  const onSubmit = async (data: LoginData) => {
+  const onSubmit = async (data: MentorLoginData) => {
     setIsPending(true);
 
     try {
