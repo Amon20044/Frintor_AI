@@ -2,23 +2,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTestWithResults, canStudentViewResults } from '@/models/testModel';
 
-export async function GET(req: NextRequest, { params }: { params: { studentId: string } }) {
+export async function GET(req: NextRequest) {
+  const studentId = req.nextUrl.pathname.split('/').pop(); // Extract UUID from the URL
+  
   try {
-    const { studentId } = params;
-    
     if (!studentId) {
       return NextResponse.json(
         { message: 'Student ID is required' },
         { status: 400 }
-      );
-    }
-
-    // Check if student can view results
-    const canView = await canStudentViewResults(studentId);
-    if (!canView) {
-      return NextResponse.json(
-        { message: 'Access denied. Complete mentor session to view results.' },
-        { status: 403 }
       );
     }
 

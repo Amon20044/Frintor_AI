@@ -3,12 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/database/db";
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { mentorId: string } }
+  req: NextRequest
 ) {
+  const mentorId = req.nextUrl.pathname.split('/').pop(); // Extract UUID from the URL
+  
   try {
-    const { mentorId } = params;
-
     if (!mentorId) {
       return NextResponse.json(
         { success: false, message: "Mentor ID is required" },

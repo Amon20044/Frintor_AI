@@ -31,6 +31,8 @@ export const registerStudent = async (student: Partial<Student>) => {
 }
 
 export const regStudent = async (student: Partial<Student>) => {
+
+    
     const { data, error } = await supabase
         .from("students")
         .insert({
