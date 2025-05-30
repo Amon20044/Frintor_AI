@@ -1,60 +1,115 @@
+
 'use client'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   User, Star, Brain, Target, BookOpen, Building, MapPin, Globe, 
   DollarSign, GraduationCap, ExternalLink, ChevronDown, ChevronUp,
   Sparkles, Award, TrendingUp, Users, Lightbulb, Search, Filter,
   Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Info,
   Briefcase, Heart, Eye, Zap, Shield, Crown, Compass, Moon, Sun,
-  ArrowRight, Play, FileText, BarChart3
+  ArrowRight, Play, FileText, BarChart3, Menu, Bell, Settings
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+interface StudentProfile {
+  uuid: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  lvl: string;
+  onboardingcompleted: boolean;
+}
+
 function Page() {
+  const [student, setStudent] = useState<StudentProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    // Simulate toast notification
-    toast.success('Welcome to the Student Dashboard! Explore your personalized insights and assessments.')  
-  }, []);   
+    fetchStudentProfile();
+  }, []);
+
+  const fetchStudentProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/student/auth';
+        return;
+      }
+
+      const response = await fetch('/api/student/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStudent(data.student);
+        toast.success(`Welcome ${data.student.first_name}! Ready to explore your potential?`);
+      } else {
+        window.location.href = '/student/auth';
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      window.location.href = '/student/auth';
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-sky-200/20 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
-              <div className="relative bg-white p-6 rounded-full shadow-xl border-2 border-blue-200">
-                <div className="text-4xl text-blue-600">
-                  <Star className="h-12 w-12" />
-                </div>
+      {/* Header Navigation */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Star className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-800">Student Portal</h1>
+                <p className="text-sm text-gray-600">Dashboard</p>
               </div>
             </div>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2 text-gray-600">
+                <User className="h-4 w-4" />
+                <span className="text-sm">{student?.first_name} {student?.last_name}</span>
+              </div>
+              <button className="p-2 hover:bg-gray-100 rounded-lg">
+                <Bell className="h-5 w-5 text-gray-600" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-lg">
+                <Settings className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-transparent bg-clip-text">
-            Student Dashboard
-          </h1>
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Welcome to your personalized learning journey. Discover your potential through AI-powered insights.
-          </p>
-        </header>
+        </div>
+      </header>
 
-        {/* Welcome Message */}
-        <div className="mb-12">
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl border border-blue-200">
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
                 <Sparkles className="h-8 w-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold">Welcome Back!</h2>
+                <h2 className="text-3xl font-bold">Welcome {student?.first_name}!</h2>
                 <p className="text-blue-100">Ready to unlock your cosmic potential?</p>
               </div>
             </div>
@@ -65,145 +120,160 @@ function Page() {
           </div>
         </div>
 
-        {/* Main Content Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Psychometric Test Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-            <div className="p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Brain className="h-8 w-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">AI-Powered Psychometric Test</h3>
-                  <p className="text-gray-600">Discover your personality traits</p>
-                </div>
-              </div>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3 text-gray-700">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span>Comprehensive personality analysis</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span>Career aptitude assessment</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span>Personalized insights & recommendations</span>
+        {/* Dashboard Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Left Column - Main Actions */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Assessment Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Psychometric Test Card */}
+              <div className="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg text-white">
+                      <Brain className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Psychometric Test</h3>
+                      <p className="text-sm text-gray-600">AI-Powered Analysis</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span>Personality analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span>Career recommendations</span>
+                    </div>
+                  </div>
+
+                  <a 
+                    href="/student/test"
+                    className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-medium text-sm"
+                  >
+                    <Play className="h-4 w-4" />
+                    Take Test
+                  </a>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-xl border border-purple-100 mb-6">
-                <div className="flex items-center gap-2 text-purple-800 mb-2">
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="font-semibold text-sm">Assessment Details</span>
-                </div>
-                <p className="text-purple-700 text-sm">
-                  Our advanced AI analyzes your responses across multiple personality dimensions to provide 
-                  accurate insights into your strengths, preferences, and ideal career paths.
-                </p>
-              </div>
+              {/* Horoscope Card */}
+              <div className="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg text-white">
+                      <Moon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Horoscope</h3>
+                      <p className="text-sm text-gray-600">Cosmic Insights</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span>Vedic astrology</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span>College matching</span>
+                    </div>
+                  </div>
 
-              <a 
-                href="/student/test"
-                className="inline-flex items-center gap-3 w-full justify-center px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl group-hover:scale-[1.02]"
-              >
-                <Play className="h-5 w-5" />
-                Take Psychometric Test
-                <ArrowRight className="h-5 w-5" />
-              </a>
+                  <a 
+                    href="/student/horoscope"
+                    className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 font-medium text-sm"
+                  >
+                    <Star className="h-4 w-4" />
+                    View Horoscope
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Overview */}
+            <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Your Progress</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-green-800">Profile Setup</p>
+                  <p className="text-xs text-green-600">Completed</p>
+                </div>
+                <div className="text-center p-4 bg-orange-50 rounded-lg">
+                  <Clock className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-orange-800">Assessment</p>
+                  <p className="text-xs text-orange-600">Pending</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <Target className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-800">Mentorship</p>
+                  <p className="text-xs text-gray-600">Not Started</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Horoscope Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-            <div className="p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-4 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Moon className="h-8 w-8" />
+          {/* Right Column - Quick Info */}
+          <div className="space-y-6">
+            {/* Profile Summary */}
+            <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Profile Summary</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Level:</span>
+                  <span className="text-sm font-medium">{student?.lvl || 'Not set'}</span>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">AI-Powered Horoscope</h3>
-                  <p className="text-gray-600">Unlock your cosmic blueprint</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Onboarding:</span>
+                  <span className={`text-sm font-medium ${student?.onboardingcompleted ? 'text-green-600' : 'text-orange-600'}`}>
+                    {student?.onboardingcompleted ? 'Complete' : 'Pending'}
+                  </span>
                 </div>
-              </div>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3 text-gray-700">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span>Vedic astrology insights</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span>Planetary influence analysis</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span>College & career recommendations</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Email:</span>
+                  <span className="text-sm font-medium text-gray-800">{student?.email}</span>
                 </div>
               </div>
-
-              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-100 mb-6">
-                <div className="flex items-center gap-2 text-blue-800 mb-2">
-                  <Compass className="h-4 w-4" />
-                  <span className="font-semibold text-sm">Cosmic Guidance</span>
-                </div>
-                <p className="text-blue-700 text-sm">
-                  Combine ancient Vedic wisdom with modern AI to understand your life path, 
-                  strengths, and the best educational institutions aligned with your destiny.
-                </p>
-              </div>
-
-              <a 
-                href="/student/horoscope"
-                className="inline-flex items-center gap-3 w-full justify-center px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl group-hover:scale-[1.02]"
-              >
-                <Star className="h-5 w-5" />
-                View Your Horoscope
-                <ArrowRight className="h-5 w-5" />
-              </a>
             </div>
-          </div>
-        </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-blue-100 hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Target className="h-6 w-6 text-green-600" />
+            {/* Quick Actions */}
+            <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  <span className="text-sm font-medium">View Results</span>
+                </button>
+                <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                  <span className="text-sm font-medium">Schedule Meeting</span>
+                </button>
+                <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                  <Mail className="h-5 w-5 text-purple-600" />
+                  <span className="text-sm font-medium">Contact Support</span>
+                </button>
               </div>
-              <h4 className="font-semibold text-gray-900">Personalized Insights</h4>
             </div>
-            <p className="text-gray-600 text-sm">
-              Get tailored recommendations based on your unique personality profile and cosmic alignment.
-            </p>
-          </div>
 
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-blue-100 hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Lightbulb className="h-6 w-6 text-orange-600" />
+            {/* Recent Activity */}
+            <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">Account created</span>
+                </div>
+                <div className="flex items-center gap-3 p-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">Profile updated</span>
+                </div>
               </div>
-              <h4 className="font-semibold text-gray-900">AI-Driven Analysis</h4>
             </div>
-            <p className="text-gray-600 text-sm">
-              Advanced algorithms analyze patterns in your responses to provide accurate career guidance.
-            </p>
-          </div>
-
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-blue-100 hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <GraduationCap className="h-6 w-6 text-blue-600" />
-              </div>
-              <h4 className="font-semibold text-gray-900">College Matching</h4>
-            </div>
-            <p className="text-gray-600 text-sm">
-              Discover the best educational institutions that align with your strengths and aspirations.
-            </p>
           </div>
         </div>
 
@@ -236,18 +306,6 @@ function Page() {
             </a>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="mt-16 text-center text-gray-600">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-5 w-5 text-blue-500" />
-            <p className="text-sm">Powered by AI & Ancient Wisdom</p>
-            <Sparkles className="h-5 w-5 text-blue-500" />
-          </div>
-          <p className="text-xs">
-            Your journey to self-discovery starts here. Unlock your potential with personalized insights.
-          </p>
-        </footer>
       </div>
     </div>
   );

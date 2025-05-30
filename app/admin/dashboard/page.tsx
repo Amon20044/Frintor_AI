@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -10,7 +11,16 @@ import {
   Eye,
   UserPlus,
   Search,
-  Filter
+  Filter,
+  Menu,
+  Bell,
+  Settings,
+  Shield,
+  BarChart3,
+  TrendingUp,
+  CheckCircle,
+  Clock,
+  Plus
 } from 'lucide-react';
 
 interface Student {
@@ -20,10 +30,16 @@ interface Student {
   email: string;
   mobile_number: string;
   lvl: string;
-  onboardingCompleted: boolean;
+  onboardingcompleted: boolean;
   assigned_mentor?: any[];
   tests?: any[];
   created_at: string;
+}
+
+interface AdminProfile {
+  uuid: string;
+  name: string;
+  user_id: string;
 }
 
 interface DashboardStats {
@@ -34,6 +50,7 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
+  const [admin, setAdmin] = useState<AdminProfile | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalStudents: 0,
@@ -46,8 +63,36 @@ export default function AdminDashboard() {
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
+    fetchAdminProfile();
     fetchDashboardData();
   }, []);
+
+  const fetchAdminProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/admin/auth';
+        return;
+      }
+
+      const response = await fetch('/api/admin/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAdmin(data.admin);
+        toast.success(`Welcome ${data.admin.name}! Ready to manage your platform?`);
+      } else {
+        window.location.href = '/admin/auth';
+      }
+    } catch (error) {
+      console.error('Error fetching admin profile:', error);
+      window.location.href = '/admin/auth';
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -73,13 +118,12 @@ export default function AdminDashboard() {
   };
 
   const assignMentor = async (studentId: string) => {
-    // This would open a modal to select and assign mentor
     toast.info('Mentor assignment feature coming soon');
   };
 
   const allowViewResults = async (studentId: string) => {
     try {
-      const res = await fetch('/admin/api/allow-results', {
+      const res = await fetch('/api/admin/allow-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ studentId })
@@ -102,8 +146,8 @@ export default function AdminDashboard() {
 
     const matchesFilter = 
       filterStatus === 'all' ||
-      (filterStatus === 'onboarded' && student.onboardingCompleted) ||
-      (filterStatus === 'pending' && !student.onboardingCompleted) ||
+      (filterStatus === 'onboarded' && student.onboardingcompleted) ||
+      (filterStatus === 'pending' && !student.onboardingcompleted) ||
       (filterStatus === 'with-mentor' && student.assigned_mentor && student.assigned_mentor.length > 0);
 
     return matchesSearch && matchesFilter;
@@ -122,13 +166,49 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Header Navigation */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Shield className="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-800">Admin Portal</h1>
+                <p className="text-sm text-gray-600">Dashboard</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2 text-gray-600">
+                <Shield className="h-4 w-4" />
+                <span className="text-sm">{admin?.name}</span>
+              </div>
+              <button className="p-2 hover:bg-gray-100 rounded-lg">
+                <Bell className="h-5 w-5 text-gray-600" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-lg">
+                <Settings className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-transparent bg-clip-text mb-2">
-            Admin Dashboard
-          </h1>
-          <p className="text-gray-600">Manage students, mentors, and monitor progress</p>
+          <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-8 text-white shadow-xl">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Shield className="h-8 w-8" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold">Welcome {admin?.name}!</h2>
+                <p className="text-orange-100">Manage your platform and oversee all operations</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -143,6 +223,10 @@ export default function AdminDashboard() {
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
             </div>
+            <div className="mt-4 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-green-500" />
+              <span className="text-sm text-green-600 font-medium">+12% from last month</span>
+            </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 border border-green-100">
@@ -154,6 +238,10 @@ export default function AdminDashboard() {
               <div className="p-3 bg-green-100 rounded-full">
                 <UserCheck className="h-6 w-6 text-green-600" />
               </div>
+            </div>
+            <div className="mt-4 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span className="text-sm text-gray-600">All active</span>
             </div>
           </div>
 
@@ -167,6 +255,10 @@ export default function AdminDashboard() {
                 <BookOpen className="h-6 w-6 text-purple-600" />
               </div>
             </div>
+            <div className="mt-4 flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-purple-500" />
+              <span className="text-sm text-gray-600">85% completion rate</span>
+            </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 border border-orange-100">
@@ -179,34 +271,44 @@ export default function AdminDashboard() {
                 <Award className="h-6 w-6 text-orange-600" />
               </div>
             </div>
+            <div className="mt-4 flex items-center gap-2">
+              <Clock className="h-4 w-4 text-orange-500" />
+              <span className="text-sm text-gray-600">In progress</span>
+            </div>
           </div>
         </div>
 
         {/* Search and Filter */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search students..."
+                placeholder="Search students by name or email..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <select
-                className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="all">All Students</option>
-                <option value="onboarded">Onboarded</option>
-                <option value="pending">Pending Onboarding</option>
-                <option value="with-mentor">With Mentor</option>
-              </select>
+            <div className="flex gap-2">
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <select
+                  className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                >
+                  <option value="all">All Students</option>
+                  <option value="onboarded">Onboarded</option>
+                  <option value="pending">Pending</option>
+                  <option value="with-mentor">With Mentor</option>
+                </select>
+              </div>
+              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <Plus className="h-4 w-4" />
+                Add Student
+              </button>
             </div>
           </div>
         </div>
@@ -214,43 +316,51 @@ export default function AdminDashboard() {
         {/* Students Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStudents.map((student) => (
-            <div key={student.uuid} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <div key={student.uuid} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
               <div className="p-6">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {student.first_name?.[0]}{student.last_name?.[0]}
                   </div>
-                  <div className="ml-3">
+                  <div className="ml-3 flex-1">
                     <h3 className="font-semibold text-lg text-gray-800">
                       {student.first_name} {student.last_name}
                     </h3>
-                    <p className="text-sm text-gray-500">{student.email}</p>
+                    <p className="text-sm text-gray-500 truncate">{student.email}</p>
                   </div>
                 </div>
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
+                <div className="space-y-3 mb-4">
+                  <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">Level:</span>
-                    <span className="font-medium">{student.lvl || 'Not set'}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Onboarding:</span>
-                    <span className={`font-medium ${student.onboardingCompleted ? 'text-green-600' : 'text-orange-600'}`}>
-                      {student.onboardingCompleted ? 'Completed' : 'Pending'}
+                    <span className="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                      {student.lvl || 'Not set'}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Test Status:</span>
-                    <span className="font-medium">
-                      {student.tests && student.tests.length > 0 ? 
-                        student.tests[0].status : 'Not assigned'}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500">Status:</span>
+                    <span className={`font-medium px-2 py-1 rounded-full text-xs ${
+                      student.onboardingcompleted 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-orange-100 text-orange-800'
+                    }`}>
+                      {student.onboardingcompleted ? 'Active' : 'Pending'}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500">Tests:</span>
+                    <span className="font-medium text-gray-800">
+                      {student.tests?.length || 0} completed
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">Mentor:</span>
-                    <span className="font-medium">
-                      {student.assigned_mentor && student.assigned_mentor.length > 0 ? 
-                        'Assigned' : 'Not assigned'}
+                    <span className={`font-medium px-2 py-1 rounded-full text-xs ${
+                      student.assigned_mentor?.length 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {student.assigned_mentor?.length ? 'Assigned' : 'Unassigned'}
                     </span>
                   </div>
                 </div>
@@ -261,14 +371,14 @@ export default function AdminDashboard() {
                     className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
                   >
                     <UserPlus className="h-4 w-4" />
-                    Assign Mentor
+                    Assign
                   </button>
                   <button
                     onClick={() => allowViewResults(student.uuid)}
                     className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
                   >
                     <Eye className="h-4 w-4" />
-                    Allow Results
+                    Results
                   </button>
                 </div>
               </div>
