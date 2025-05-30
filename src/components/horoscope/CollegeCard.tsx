@@ -4,7 +4,7 @@ import {
   MapPin, DollarSign, Award, CheckCircle, Eye, Globe, ExternalLink,
   ChevronDown, ChevronUp
 } from 'lucide-react';
-import { CollegeCardProps } from '@/src/types/horoscope';
+import { CollegeCardProps } from '@/src/types/horoscope/component.types';
 
 export const CollegeCard: React.FC<CollegeCardProps> = ({ 
   college, 

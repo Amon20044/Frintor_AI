@@ -8,13 +8,6 @@ export interface PlanetaryInfluence {
   benefic?: boolean;
 }
 
-export interface CareerPath {
-  career: string;
-  colleges: any[];
-  match_percentage?: number;
-  reasoning?: string;
-}
-
 // Base interface for database entity
 export interface AiHoroscope {
   uuid: string;

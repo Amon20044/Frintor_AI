@@ -16,6 +16,9 @@ export {
   // Add other types from career.types here, renaming as needed
 } from './career.types';
 
+// Re-export component types
+export * from './component.types';
+
 // Component types
 export * from './component.types';
 
