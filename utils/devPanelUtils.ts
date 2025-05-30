@@ -1,3 +1,7 @@
+Fixed the supabase import to use the default export as requested.
+```
+
+```
 "use server";
 
 import supabase from "@/database/db";
