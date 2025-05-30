@@ -12,19 +12,9 @@ import { toast } from 'sonner';
 
 function Page() {
   useEffect(() => {
-    const storedUuid = localStorage.getItem('uuid');
-    console.log('UUID from localStorage:', storedUuid);
-    
-    if (!storedUuid) {
-      console.error('No UUID found in localStorage');
-      // Redirect to dashboard if no UUID
-      window.location.href = '/student/dashboard';
-      return;
-    }
-    
-    setUuid(storedUuid);
-    setLoading(false);
-  }, []);
+    // Simulate toast notification
+    toast.success('Welcome to the Student Dashboard! Explore your personalized insights and assessments.')  
+  }, []);   
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
