@@ -57,7 +57,7 @@ export default function MentorDashboard() {
 
   const fetchMentorProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('mentorToken');
       if (!token) {
         window.location.href = '/mentor/auth';
         return;
