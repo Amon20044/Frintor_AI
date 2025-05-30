@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -53,14 +52,14 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       // Fetch students
-      const studentsRes = await fetch('/admin/api/students');
+      const studentsRes = await fetch('/api/admin/students');
       if (studentsRes.ok) {
         const studentsData = await studentsRes.json();
         setStudents(studentsData.students);
       }
 
       // Fetch stats
-      const statsRes = await fetch('/admin/api/dashboard-stats');
+      const statsRes = await fetch('/api/admin/dashboard-stats');
       if (statsRes.ok) {
         const statsData = await statsRes.json();
         setStats(statsData.stats);

@@ -46,7 +46,7 @@ export default function MentorDashboard() {
 
   const fetchAssignedStudents = async (mentorId: string) => {
     try {
-      const res = await fetch(`/mentor/api/students/${mentorId}`);
+      const res = await fetch(`/api/mentor/students/${mentorId}`);
       if (res.ok) {
         const data = await res.json();
         setAssignedStudents(data.students);
@@ -61,7 +61,7 @@ export default function MentorDashboard() {
 
   const allowViewResults = async (studentId: string) => {
     try {
-      const res = await fetch('/mentor/api/allow-results', {
+      const res = await fetch('/api/mentor/allow-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ studentId, mentorId })
@@ -82,7 +82,7 @@ export default function MentorDashboard() {
 
   const markMeetingCompleted = async (assignmentId: string) => {
     try {
-      const res = await fetch('/mentor/api/complete-meeting', {
+      const res = await fetch('/api/mentor/complete-meeting', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assignmentId })
