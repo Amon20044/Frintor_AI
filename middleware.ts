@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-export async function middleware(request: NextRequest, response: NextResponse) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
@@ -10,6 +10,18 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
+  }
+
+  // API routes that need special handling
+  if (pathname.startsWith('/api/')) {
+    const response = NextResponse.next();
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    
+    if (request.method === 'OPTIONS') {
+      return response;
+    }
   }
 
   // Check for authentication tokens based on route

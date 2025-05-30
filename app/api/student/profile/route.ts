@@ -4,6 +4,15 @@ import supabase from "@/database/db";
 
 export async function GET(req: NextRequest) {
   try {
+    const studentId = req.nextUrl.pathname.split('/').pop();
+
+    if (!studentId) {
+      return NextResponse.json(
+        { message: 'Student ID is required' },
+        { status: 400 }
+      );
+    }
+
     const tokenVerification = await verifyToken(req);
     if (!tokenVerification.valid) {
       return NextResponse.json(
@@ -32,10 +41,10 @@ export async function GET(req: NextRequest) {
       student,
     });
   } catch (error) {
-    console.error("Error fetching student profile:", error);
+    console.error('Error in student profile route:', error);
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
-      { status: 500 },
+      { message: 'Internal server error' },
+      { status: 500 }
     );
   }
 }
