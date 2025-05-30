@@ -1,3 +1,4 @@
+"use server";
 import supabase from "@/database/db";
 import { genHash } from "@/utils/generateHash";
 
