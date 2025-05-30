@@ -23,7 +23,7 @@ export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisP
   const { selectedCareer, setSelectedCareer, expandedSections, toggleSection } = useHoroscopeState();
 
   console.log('VedicHoroscopeAnalysis render:', { uuid, loading, error, horoscopeData });
-
+  console.log('Selected Career:', horoscopeData);
   // Loading state
   if (loading) {
     return <LoadingState />;
