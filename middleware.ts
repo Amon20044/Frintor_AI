@@ -1,36 +1,40 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
-
-export async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest, response: NextResponse) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/student/auth', '/mentor/auth', '/admin/auth'];
-  
+  const publicRoutes = ["/", "/student/auth", "/mentor/auth", "/admin/auth"];
+
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
   }
 
   // Check for authentication tokens based on route
   let token = null;
-  let redirectPath = '/';
+  let redirectPath = "/";
 
-  if (pathname.startsWith('/student')) {
-    token = request.cookies.get('studentToken')?.value || 
-            request.headers.get('authorization')?.split(' ')[1];
-    redirectPath = '/student/auth';
-  } else if (pathname.startsWith('/mentor')) {
-    token = request.cookies.get('mentorToken')?.value ||
-            request.headers.get('authorization')?.split(' ')[1];
-    redirectPath = '/mentor/auth';
-  } else if (pathname.startsWith('/admin')) {
-    token = request.cookies.get('adminToken')?.value ||
-            request.headers.get('authorization')?.split(' ')[1];
-    redirectPath = '/admin/auth';
+  if (pathname.startsWith("/student")) {
+    token =
+      request.cookies.get("studentToken")?.value ||
+      request.headers.get("authorization")?.split(" ")[1];
+    redirectPath = "/student/auth";
+  } else if (pathname.startsWith("/mentor")) {
+    token =
+      request.cookies.get("mentorToken")?.value ||
+      request.headers.get("authorization")?.split(" ")[1];
+    redirectPath = "/mentor/auth";
+  } else if (pathname.startsWith("/admin")) {
+    token =
+      request.cookies.get("adminToken")?.value ||
+      request.headers.get("authorization")?.split(" ")[1];
+    redirectPath = "/admin/auth";
   }
-
+  request.headers.set("Access-Control-Allow-Origin", "*");
+  request.headers.set("Access-Control-Allow-Methods", "*");
+  request.headers.set("Access-Control-Allow-Headers", "Content-Type");
   if (!token) {
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }
@@ -40,15 +44,11 @@ export async function middleware(request: NextRequest) {
     await jwtVerify(token, secret);
     return NextResponse.next();
   } catch (error) {
-    console.error('JWT verification failed:', error);
+    console.error("JWT verification failed:", error);
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 }
 
 export const config = {
-  matcher: [
-    '/student/:path*',
-    '/mentor/:path*',
-    '/admin/:path*',
-  ],
+  matcher: ["/student/:path*", "/mentor/:path*", "/admin/:path*"],
 };

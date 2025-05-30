@@ -1,0 +1,304 @@
+-- Disable Row Level Security for existing tables
+alter table students DISABLE row LEVEL SECURITY;
+
+alter table mentor DISABLE row LEVEL SECURITY;
+
+alter table assigned_mentor DISABLE row LEVEL SECURITY;
+
+alter table ai_horoscope DISABLE row LEVEL SECURITY;
+
+alter table admin DISABLE row LEVEL SECURITY;
+
+alter table sub_admin DISABLE row LEVEL SECURITY;
+
+alter table newsletter DISABLE row LEVEL SECURITY;
+
+alter table tests DISABLE row LEVEL SECURITY;
+
+alter table test_results DISABLE row LEVEL SECURITY;
+
+alter table career_recommendations DISABLE row LEVEL SECURITY;
+
+alter table mentor_sessions DISABLE row LEVEL SECURITY;
+
+-- Drop tables if exist to recreate fresh schema
+drop table if exists assigned_mentor CASCADE;
+
+drop table if exists chats CASCADE;
+
+drop table if exists messages CASCADE;
+
+drop table if exists users CASCADE;
+
+drop table if exists mentor_sessions CASCADE;
+
+drop table if exists test_results CASCADE;
+
+drop table if exists tests CASCADE;
+
+drop table if exists career_recommendations CASCADE;
+
+drop table if exists newsletter CASCADE;
+
+drop table if exists ai_horoscope CASCADE;
+
+drop table if exists mentor CASCADE;
+
+drop table if exists sub_admin CASCADE;
+
+drop table if exists admin CASCADE;
+
+drop table if exists students CASCADE;
+
+drop table if exists payments CASCADE;
+-- ================================
+-- ENUMS
+-- ================================
+create type gender as ENUM('MALE', 'FEMALE', 'OTHER');
+
+create type level as ENUM(
+  'MID_SCHOOL',
+  'HIGH_SCHOOL',
+  'UNDERGRADUATE',
+  'POSTGRADUATE',
+  'WORKING_PROFESSIONAL'
+);
+
+create type assigned_status as ENUM('ACTIVE', 'COMPLETED', 'UNASSIGNED');
+
+create type test_status as ENUM('PENDING', 'IN_PROGRESS', 'COMPLETED');
+
+create type session_status as ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED');
+
+-- ================================
+-- TABLE: sub_admin
+-- ================================
+create table sub_admin (
+  uuid uuid primary key default gen_random_uuid (),
+  name text not null,
+  email text unique not null,
+  mobile_number text,
+  password text not null,
+  created_at TIMESTAMPTZ default now(),
+  updated_at TIMESTAMPTZ default now(),
+  is_deleted boolean default false
+);
+
+-- ================================
+-- TABLE: admin
+-- ================================
+create table admin (
+  uuid uuid primary key default gen_random_uuid (),
+  user_id text unique not null,
+  name text not null,
+  mobile_number text,
+  password text not null,
+  created_at TIMESTAMPTZ default now(),
+  updated_at TIMESTAMPTZ default now()
+);
+
+
+-- ================================
+-- TABLE: students
+-- ================================
+CREATE TABLE students (
+  uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id uuid references auth.users(id) on delete cascade,
+  first_name TEXT,
+  last_name TEXT,
+  age TEXT,
+  email TEXT UNIQUE,
+  mobile_number TEXT UNIQUE,
+  password TEXT,
+  dateOfBirth TEXT,
+  timeOfBirth TEXT,
+  placeOfBirth TEXT,
+  gender gender,
+  category TEXT,
+  birth_date text,
+  interest text[],
+  lvl level,
+  education jsonb,
+  studentMetadata jsonb,
+  preferences jsonb,
+  email_verified BOOLEAN DEFAULT FALSE,
+  onboardingCompleted BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ================================
+-- TABLE: payments
+-- ================================
+CREATE TABLE payments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id UUID REFERENCES students(uuid) ON DELETE CASCADE,
+  amount TEXT,
+  payment JSONB DEFAULT '{}'::jsonb,
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'captured', 'failed')),
+  payment_verified BOOLEAN DEFAULT FALSE,
+  paid BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+
+-- ================================
+-- TABLE: mentor
+-- ================================
+create table mentor (
+  uuid uuid primary key default gen_random_uuid (),
+  mentor_name text not null,
+  mobile_number text,
+  email text unique,
+  password text,
+  metadata jsonb,
+  preferences_settings jsonb,
+  sub_admin_id uuid references sub_admin (uuid),
+  created_at TIMESTAMPTZ default now(),
+  updated_at TIMESTAMPTZ default now()
+);
+
+-- ================================
+-- TABLE: assigned_mentor
+-- ================================
+create table assigned_mentor (
+  uuid uuid primary key default gen_random_uuid (),
+  student_id uuid references students (uuid),
+  mentor_id uuid references mentor (uuid),
+  assigned_at TIMESTAMPTZ default now(),
+  status assigned_status default 'ACTIVE',
+  meeting_status session_status default 'SCHEDULED',
+  meeting_link text
+);
+
+-- ================================
+-- TABLE: ai_horoscope
+-- ================================
+create table ai_horoscope (
+  uuid uuid primary key default gen_random_uuid (),
+  student_id uuid references students (uuid),
+  horoscope jsonb,
+  verfied boolean default false,
+  generated_at TIMESTAMPTZ default now()
+);
+
+-- ================================
+-- TABLE: newsletter
+-- ================================
+create table newsletter (
+  uuid uuid primary key default gen_random_uuid (),
+  title text not null,
+  description text,
+  content text,
+  img_url text,
+  metadata jsonb,
+  published_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ default now(),
+  updated_at TIMESTAMPTZ default now(),
+  is_published boolean default false
+);
+
+-- ================================
+-- TABLE: tests
+-- ================================
+
+create table tests (
+  uuid uuid primary key default gen_random_uuid (),
+  student_id uuid references students (uuid),
+  test_type text,
+  assigned_at TIMESTAMPTZ default now(),
+  completed_at TIMESTAMPTZ,
+  status test_status default 'PENDING',
+  test_structure jsonb -- Store the structure of the test including questions and answers
+);
+
+-- ================================
+-- TABLE: test_results
+-- ================================
+create table test_results (
+  uuid uuid primary key default gen_random_uuid (),
+  test_id uuid references tests (uuid),
+  marks integer,
+  test_structure jsonb, -- Store the student's answers and any additional test data
+  evaluated_at TIMESTAMPTZ default now()
+);
+
+-- ================================
+-- INDEXES and TRIGGERS can be added here if needed
+-- ================================
+
+-- STUDENTS table
+CREATE INDEX idx_students_email ON students(email);
+CREATE INDEX idx_students_mobile_number ON students(mobile_number);
+CREATE INDEX idx_students_gender ON students(gender);
+CREATE INDEX idx_students_lvl ON students(lvl);
+CREATE INDEX idx_students_created_at ON students(created_at);
+
+-- PAYMENTS table
+CREATE INDEX idx_payments_student_id ON payments(student_id);
+CREATE INDEX idx_payments_status ON payments(payment_status);
+CREATE INDEX idx_payments_created_at ON payments(created_at);
+
+-- MENTOR table
+CREATE INDEX idx_mentor_email ON mentor(email);
+CREATE INDEX idx_mentor_sub_admin_id ON mentor(sub_admin_id);
+
+-- ASSIGNED_MENTOR table
+CREATE INDEX idx_assigned_mentor_student_id ON assigned_mentor(student_id);
+CREATE INDEX idx_assigned_mentor_mentor_id ON assigned_mentor(mentor_id);
+CREATE INDEX idx_assigned_mentor_status ON assigned_mentor(status);
+CREATE INDEX idx_assigned_mentor_meeting_status ON assigned_mentor(meeting_status);
+
+-- AI_HOROSCOPE table
+CREATE INDEX idx_ai_horoscope_student_id ON ai_horoscope(student_id);
+CREATE INDEX idx_ai_horoscope_generated_at ON ai_horoscope(generated_at);
+
+-- TESTS table
+CREATE INDEX idx_tests_student_id ON tests(student_id);
+CREATE INDEX idx_tests_status ON tests(status);
+CREATE INDEX idx_tests_assigned_at ON tests(assigned_at);
+
+-- TEST_RESULTS table
+CREATE INDEX idx_test_results_test_id ON test_results(test_id);
+CREATE INDEX idx_test_results_evaluated_at ON test_results(evaluated_at);
+
+-- NEWSLETTER table
+CREATE INDEX idx_newsletter_is_published ON newsletter(is_published);
+CREATE INDEX idx_newsletter_published_at ON newsletter(published_at);
+
+
+
+CREATE OR REPLACE FUNCTION update_email_verified()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE students
+  SET email_verified = TRUE
+  WHERE student_id = NEW.id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_email_verified
+AFTER UPDATE OF last_sign_in_at ON auth.users
+FOR EACH ROW
+WHEN (NEW.last_sign_in_at IS NOT NULL)
+EXECUTE FUNCTION update_email_verified();
+
+-------------------------------------------
+
+CREATE OR REPLACE FUNCTION update_test_status_to_completed()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE tests
+  SET status = 'COMPLETED',
+      completed_at = NOW()
+  WHERE uuid = NEW.test_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_test_status
+AFTER INSERT ON test_results
+FOR EACH ROW
+EXECUTE FUNCTION update_test_status_to_completed();

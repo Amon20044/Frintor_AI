@@ -87,6 +87,7 @@ export default function LoginForm() {
     toast.success("Student logged in successfully");
 
     // Use window.location.replace for better navigation
+    console.log("Student onboarding status:", student.onboardingcompleted);
     if (student.onboardingcompleted) {
       window.location.replace("/student/dashboard");
     } else {
