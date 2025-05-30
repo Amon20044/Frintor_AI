@@ -34,9 +34,9 @@ export const onboardingSchema = z.object({
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
     required_error: "Gender is required",
   }),
-  category: z.string().optional(),
-  permanent_address: z.string().optional(),
-  current_address: z.string().optional(),
+  category: z.string(),
+  permanent_address: z.string(),
+  current_address: z.string(),
 
   // Horoscope Requirements
   dateOfBirth: z.string().min(1, "Date of birth is required"),
@@ -49,8 +49,8 @@ export const onboardingSchema = z.object({
   }),
   
   // Basic Academic Info
-  tenth_percentage: z.string().optional(),
-  tenth_year: z.string().optional(),
+  tenth_percentage: z.string().min(1, "10th percentage is required"),
+  tenth_year: z.string().min(1, "10th passing year is required"),
   twelfth_percentage: z.string().optional(),
   twelfth_year: z.string().optional(),
   academic_background: z.string().optional(),
@@ -79,7 +79,7 @@ export const onboardingSchema = z.object({
   // Preferences & Interests
   interest: z.string().min(1, "Interests are required"),
   preferences: z.string().optional(),
-  career_goals: z.string().optional(),
+  career_goals: z.string().min(1, "Career goals are required"),
 
   // Parent's Details (simplified)
   father_name: z.string().optional(),

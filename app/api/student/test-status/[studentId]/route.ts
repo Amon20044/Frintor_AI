@@ -3,10 +3,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStudentTestStatus } from '@/models/testModel';
 
-export async function GET(req: NextRequest, { params }: { params: { studentId: string } }) {
-  console.log('Fetching test status for studentId:', params.studentId);
+export async function GET(req: NextRequest ) {
+  const studentId = req.nextUrl.pathname.split('/').pop(); // Extract UUID from the URL
+  console.log('Fetching test status for studentId:', studentId);
   try {
-    const { studentId } = params;
     if (!studentId) {
       return NextResponse.json(
         { message: 'Student ID is required' },

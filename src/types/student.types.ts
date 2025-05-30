@@ -1,5 +1,4 @@
-
-import { Gender, Level } from './enums';
+import { Level, Gender } from "@/types/enums";
 
 interface StudentMetadata {
   classOrLevel: string; // e.g., "10th", "BTech"

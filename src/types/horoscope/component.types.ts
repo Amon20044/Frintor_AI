@@ -1,5 +1,5 @@
 import React from 'react';
-import { HoroscopeData, ZodiacSign, Planet } from './base.types';
+import { HoroscopeData } from './base.types';
 import { College } from './career.types';
 
 // Component props interface
@@ -45,10 +45,8 @@ export interface CollegeCardProps {
   showFullDetails?: boolean;
   customActions?: React.ReactNode;
 }
-
-// Zodiac icon mapping
 export interface ZodiacIconMap {
-  [key in ZodiacSign]: string;
+  [key : string]: string;
 }
 
 export const DEFAULT_ZODIAC_ICONS: ZodiacIconMap = {
@@ -59,7 +57,7 @@ export const DEFAULT_ZODIAC_ICONS: ZodiacIconMap = {
 
 // Planet icon mapping
 export interface PlanetIconMap {
-  [key in Planet]: string;
+  [key : string]: string;
 }
 
 export const DEFAULT_PLANET_ICONS: PlanetIconMap = {

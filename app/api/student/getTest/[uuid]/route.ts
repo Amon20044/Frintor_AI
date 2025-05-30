@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTest } from '@/models/testModel'; // adjust if your function is in another path
 import { verifyToken } from "@/middleware/authMiddleware";
 export async function GET(req: NextRequest) {
+  
+  console.log("Received GET request for test data", req);
   const auth = await verifyToken(req);
   if (!auth.valid || !auth.payload) {
     return NextResponse.json({ error: auth.error || "Unauthorized" }, { status: 401 });

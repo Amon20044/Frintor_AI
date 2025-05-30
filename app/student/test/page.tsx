@@ -57,7 +57,7 @@ export default function StudentTestPage() {
 
             // If they can view results, fetch them
             if (accessData.canView) {
-              const resultsRes = await fetch(`api/student/test-results/${studentId}`);
+              const resultsRes = await fetch(`/api/student/test-results/${studentId}`);
               if (resultsRes.ok) {
                 const resultsData = await resultsRes.json();
                 setTestResults(resultsData.results);

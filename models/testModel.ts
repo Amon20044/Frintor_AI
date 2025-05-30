@@ -23,19 +23,22 @@ export async function setTestResult(testResult: Partial<TestResult>): Promise<Pa
   }
 }
 
-export async function getTest(uuid: string): Promise<Partial<Test> | null> {
+export async function getTest(uuid: string) {
   try {
+    console.log("Fetching test for UUID:", uuid); // Log the UUID for debugging
     const { data, error } = await supabase
       .from('tests')
       .select('*')
       .eq('student_id', uuid)
+      .order('assigned_at', { ascending: false }) // Order by created_at in descending order
+      .limit(1) // Limit to one row
       .single();
 
+    console.log('Fetched test data:', data); // Log the fetched data for debugging
     if (error) {
       console.error('Error fetching test:', error.message);
       return null;
     }
-
     return data as Partial<Test>;
   } catch (err) {
     console.error('Unexpected error in getTest:', err);

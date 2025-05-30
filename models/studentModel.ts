@@ -12,7 +12,7 @@ export const signIn = async (email: string, password: string) => supabase.auth.s
     password
 })
 
-export const registerStudent = async (student: Student) => {
+export const registerStudent = async (student: Partial<Student>) => {
     const { data, error } = await supabase
         .from("students")
         .insert({
@@ -27,10 +27,10 @@ export const registerStudent = async (student: Student) => {
         throw new Error(error.message);
     }
 
-    return data;
+    return data as Partial<Student>;
 }
 
-export const regStudent = async (student: Student) => {
+export const regStudent = async (student: Partial<Student>) => {
     const { data, error } = await supabase
         .from("students")
         .insert({
@@ -70,7 +70,7 @@ export const logStudent = async (email: string, password: string): Promise<Stude
     return dataStudent;
 }
 
-export const onboardStudent = async (student: any): Promise<Student | null> => {
+export const onboardStudent = async (student: any): Promise<Partial<Student> | null> => {
   try {
     console.log("Onboarding student:", student);
     const { data, error } = await supabase
@@ -80,21 +80,21 @@ export const onboardStudent = async (student: any): Promise<Student | null> => {
         last_name: student.last_name,
         age: student.age,
         gender: student.gender,
-        dateOfBirth: student.dateOfBirth,
-        timeOfBirth: student.timeOfBirth,
-        placeOfBirth: student.placeOfBirth,
+        dateofbirth: student.dateofbirth,
+        timeofbirth: student.timeofbirth,
+        placeofbirth: student.placeofbirth,
         email: student.email,
         mobile_number: student.mobile_number,
         category: student.category,
         lvl: student.lvl,
         interest: student.interest,
         education: student.education,
-        studentMetadata: student.studentMetadata,
+        studentmetadata: student.studentmetadata,
         preferences: student.preferences,
         onboardingcompleted: true,
         updated_at: new Date().toISOString(),
       })
-      .eq("uuid", student.uuid)
+      .eq("uuid", student.student_id)
       .select()
       .single();
 
@@ -104,7 +104,7 @@ export const onboardStudent = async (student: any): Promise<Student | null> => {
     }
 
     console.log("Student onboarded successfully:", data);
-    return data as Student;
+    return data as Partial<Student>;
   } catch (error) {
     console.error("Error in onboardStudent:", error);
     return null;

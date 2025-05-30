@@ -35,7 +35,7 @@ export default function TestForm({ params, onTestComplete }: TestFormProps) {
           throw new Error('No student UUID found');
         }
         
-        const res = await fetch(`api/student/getTest/${studentUuid}`, {
+        const res = await fetch(`/api/student/getTest/${studentUuid}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
