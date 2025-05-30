@@ -99,71 +99,7 @@ export default function OnboardingPage() {
                 Personal Details
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name
-                  </label>
-                  <input
-                    id="first_name"
-                    type="text"
-                    placeholder="Rajesh"
-                    {...register("first_name")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                  {errors.first_name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.first_name.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    id="last_name"
-                    type="text"
-                    placeholder="Sharma"
-                    {...register("last_name")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                  {errors.last_name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="rajesh.sharma@gmail.com"
-                    {...register("email")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="mobile_number" className="block text-sm font-medium text-gray-700 mb-2">
-                    Mobile Number
-                  </label>
-                  <input
-                    id="mobile_number"
-                    type="tel"
-                    placeholder="+91 9876543210"
-                    {...register("mobile_number")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                  {errors.mobile_number && (
-                    <p className="text-red-500 text-sm mt-1">{errors.mobile_number.message}</p>
-                  )}
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
                     Gender

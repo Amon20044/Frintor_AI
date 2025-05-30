@@ -23,15 +23,17 @@ export const registerSchema = z
   });
 
 export const onboardingSchema = z.object({
-  // Personal Details
+  // Personal Details (already collected in registration)
   first_name: z.string().optional(),
   last_name: z.string().optional(),
+  email: z.string().optional(),
+  mobile_number: z.string().optional(),
+  
+  // Additional Personal Details
   age: z.string().min(1, "Age is required"),
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
     required_error: "Gender is required",
   }),
-  email: z.string().optional(),
-  mobile_number: z.string().optional(),
   category: z.string().optional(),
   permanent_address: z.string().optional(),
   current_address: z.string().optional(),
