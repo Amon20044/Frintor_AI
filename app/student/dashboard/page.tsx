@@ -42,10 +42,16 @@ interface HoroscopeStatus {
   verified: boolean;
 }
 
+interface TestStatus {
+  exists: boolean;
+  status: string;
+}
+
 function Page() {
   const [student, setStudent] = useState<StudentProfile | null>(null);
   const [assignedMentor, setAssignedMentor] = useState<AssignedMentor | null>(null);
   const [horoscopeStatus, setHoroscopeStatus] = useState<HoroscopeStatus>({ exists: false, verified: false });
+  const [testStatus, setTestStatus] = useState<TestStatus>({ exists: false, status: 'PENDING' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -75,6 +81,9 @@ function Page() {
         
         // Fetch horoscope verification status
         await fetchHoroscopeStatus(data.student.uuid);
+        
+        // Fetch test status
+        await fetchTestStatus(data.student.uuid);
         
         toast.success(`Welcome ${data.student.first_name}! Ready to explore your potential?`);
       } else {
@@ -119,6 +128,27 @@ function Page() {
       }
     } catch (error) {
       console.error('Error fetching horoscope status:', error);
+    }
+  };
+
+  const fetchTestStatus = async (studentId: string) => {
+    try {
+      const response = await fetch(`/api/student/test-status/${studentId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.test) {
+          setTestStatus({ exists: true, status: data.test.status });
+        } else {
+          setTestStatus({ exists: false, status: 'PENDING' });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching test status:', error);
     }
   };
 
@@ -260,70 +290,93 @@ function Page() {
                   ) : horoscopeStatus.exists && !horoscopeStatus.verified ? (
                     <div className="w-full px-4 py-3 bg-orange-50 border border-orange-200 text-orange-700 rounded-lg text-center text-sm">
                       <Clock className="h-4 w-4 inline mr-2" />
-                      Pending Mentor Verification
+                      Verification of Horoscope is Pending
                     </div>
                   ) : (
-                    <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-600 rounded-lg text-center text-sm">
-                      <AlertCircle className="h-4 w-4 inline mr-2" />
-                      Horoscope Not Generated Yet
-                    </div>
+                    <button 
+                      className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 font-medium text-sm"
+                      onClick={() => toast.info('Complete your psychometric test to generate horoscope')}
+                    >
+                      <Star className="h-4 w-4" />
+                      Generate Horoscope
+                    </button>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Mentor Assignment Section */}
+            {/* Test Status Section */}
             <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <UserCheck className="h-5 w-5 text-green-600" />
-                Your Mentor
+                <Brain className="h-5 w-5 text-purple-600" />
+                Psychometric Analysis
               </h3>
               
-              {assignedMentor ? (
+              {testStatus.exists && testStatus.status === 'COMPLETED' ? (
                 <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                        {assignedMentor.mentor.mentor_name.charAt(0)}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{assignedMentor.mentor.mentor_name}</h4>
-                        <p className="text-sm text-gray-600">{assignedMentor.mentor.email}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            assignedMentor.meeting_status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                            assignedMentor.meeting_status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' : 
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {assignedMentor.meeting_status}
-                          </span>
-                        </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white">
+                      <CheckCircle className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Psychometric Analysis Assignment Done</h4>
+                      <p className="text-sm text-gray-600">Your test has been completed successfully</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">
+                          COMPLETED
+                        </span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
-                        <MessageCircle className="h-4 w-4" />
-                      </button>
-                      {assignedMentor.meeting_link && (
-                        <a 
-                          href={assignedMentor.meeting_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
-                        >
-                          <Video className="h-4 w-4" />
-                        </a>
-                      )}
+                  </div>
+                  <div className="mt-4 flex gap-2">
+                    <a 
+                      href="/student/test-results"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    >
+                      View Results
+                    </a>
+                  </div>
+                </div>
+              ) : testStatus.exists ? (
+                <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center text-white">
+                      <Clock className="h-6 w-6" />
                     </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Test In Progress</h4>
+                      <p className="text-sm text-gray-600">Complete your psychometric test</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800">
+                          {testStatus.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <a 
+                      href="/student/test"
+                      className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                    >
+                      Continue Test
+                    </a>
                   </div>
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
-                  <UserCheck className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-600 font-medium">No mentor assigned yet</p>
+                  <Brain className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-600 font-medium">No test started yet</p>
                   <p className="text-sm text-gray-500 mt-1">
-                    A mentor will be assigned to you soon to help guide your career journey.
+                    Take your psychometric test to unlock personalized insights.
                   </p>
+                  <div className="mt-4">
+                    <a 
+                      href="/student/test"
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                    >
+                      Start Test
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
@@ -338,19 +391,19 @@ function Page() {
                   <p className="text-xs text-green-600">Completed</p>
                 </div>
                 <div className={`text-center p-4 rounded-lg ${
-                  assignedMentor ? 'bg-green-50' : 'bg-orange-50'
+                  testStatus.exists && testStatus.status === 'COMPLETED' ? 'bg-green-50' : 'bg-orange-50'
                 }`}>
-                  {assignedMentor ? (
+                  {testStatus.exists && testStatus.status === 'COMPLETED' ? (
                     <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
                   ) : (
                     <Clock className="h-8 w-8 text-orange-600 mx-auto mb-2" />
                   )}
                   <p className={`text-sm font-medium ${
-                    assignedMentor ? 'text-green-800' : 'text-orange-800'
-                  }`}>Mentor Assignment</p>
+                    testStatus.exists && testStatus.status === 'COMPLETED' ? 'text-green-800' : 'text-orange-800'
+                  }`}>Psychometric Test</p>
                   <p className={`text-xs ${
-                    assignedMentor ? 'text-green-600' : 'text-orange-600'
-                  }`}>{assignedMentor ? 'Assigned' : 'Pending'}</p>
+                    testStatus.exists && testStatus.status === 'COMPLETED' ? 'text-green-600' : 'text-orange-600'
+                  }`}>{testStatus.exists && testStatus.status === 'COMPLETED' ? 'Completed' : 'Pending'}</p>
                 </div>
                 <div className={`text-center p-4 rounded-lg ${
                   horoscopeStatus.verified ? 'bg-green-50' : 'bg-gray-50'
@@ -421,16 +474,18 @@ function Page() {
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span className="text-sm text-gray-600">Account created</span>
                 </div>
-                {assignedMentor && (
+                {testStatus.exists && testStatus.status === 'COMPLETED' && (
                   <div className="flex items-center gap-3 p-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Mentor assigned</span>
+                    <span className="text-sm text-gray-600">Psychometric test completed</span>
                   </div>
                 )}
-                {horoscopeStatus.verified && (
+                {horoscopeStatus.exists && (
                   <div className="flex items-center gap-3 p-2">
                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Horoscope verified</span>
+                    <span className="text-sm text-gray-600">
+                      {horoscopeStatus.verified ? 'Horoscope verified' : 'Horoscope generated'}
+                    </span>
                   </div>
                 )}
               </div>
@@ -458,11 +513,22 @@ function Page() {
               <Brain className="h-5 w-5" />
               Start Assessment
             </a>
-            {assignedMentor && (
-              <button className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-semibold backdrop-blur-sm border border-white/30">
-                <MessageCircle className="h-5 w-5" />
-                Contact Mentor
-              </button>
+            {testStatus.exists && testStatus.status === 'COMPLETED' ? (
+              <a 
+                href="/student/test-results"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-semibold backdrop-blur-sm border border-white/30"
+              >
+                <BarChart3 className="h-5 w-5" />
+                View Results
+              </a>
+            ) : (
+              <a 
+                href="/student/test"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-semibold backdrop-blur-sm border border-white/30"
+              >
+                <Brain className="h-5 w-5" />
+                Continue Test
+              </a>
             )}
           </div>
         </div>
