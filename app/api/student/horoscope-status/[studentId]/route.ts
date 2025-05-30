@@ -4,11 +4,10 @@ import supabase from "@/database/db";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { studentId: string } }
 ) {
   try {
-    const { studentId } = params;
-
+    const studentId = req.nextUrl.pathname.split('/').pop(); // Extract UUID from the URL
+    
     if (!studentId) {
       return NextResponse.json(
         { success: false, message: "Student ID is required" },
