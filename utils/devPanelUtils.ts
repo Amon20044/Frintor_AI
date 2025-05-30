@@ -1,5 +1,7 @@
-import { supabase } from '@/database/db';
-import { genHash } from '@/utils/generateHash';
+"use server";
+
+import supabase from "@/database/db";
+import { genHash } from "@/utils/generateHash";
 
 // Types for the utility functions
 export interface DevStudentData {
@@ -9,8 +11,13 @@ export interface DevStudentData {
   mobile_number: string;
   password: string;
   age?: string;
-  gender?: 'MALE' | 'FEMALE' | 'OTHER';
-  lvl?: 'MID_SCHOOL' | 'HIGH_SCHOOL' | 'UNDERGRADUATE' | 'POSTGRADUATE' | 'WORKING_PROFESSIONAL';
+  gender?: "MALE" | "FEMALE" | "OTHER";
+  lvl?:
+    | "MID_SCHOOL"
+    | "HIGH_SCHOOL"
+    | "UNDERGRADUATE"
+    | "POSTGRADUATE"
+    | "WORKING_PROFESSIONAL";
   dateOfBirth?: string;
   timeOfBirth?: string;
   placeOfBirth?: string;
@@ -75,31 +82,31 @@ export const createDevStudent = async (studentData: DevStudentData) => {
       email_verified: false,
       onboardingCompleted: studentData.onboardingCompleted || false,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
-      .from('students')
+      .from("students")
       .insert(studentToInsert)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating student:', error);
+      console.error("Error creating student:", error);
       throw new Error(`Failed to create student: ${error.message}`);
     }
 
     return {
       success: true,
       data,
-      message: 'Student created successfully'
+      message: "Student created successfully",
     };
   } catch (error) {
-    console.error('Error in createDevStudent:', error);
+    console.error("Error in createDevStudent:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'Failed to create student'
+      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Failed to create student",
     };
   }
 };
@@ -120,31 +127,31 @@ export const createDevMentor = async (mentorData: DevMentorData) => {
       preferences_settings: mentorData.preferences_settings || {},
       sub_admin_id: mentorData.sub_admin_id || null,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
-      .from('mentor')
+      .from("mentor")
       .insert(mentorToInsert)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating mentor:', error);
+      console.error("Error creating mentor:", error);
       throw new Error(`Failed to create mentor: ${error.message}`);
     }
 
     return {
       success: true,
       data,
-      message: 'Mentor created successfully'
+      message: "Mentor created successfully",
     };
   } catch (error) {
-    console.error('Error in createDevMentor:', error);
+    console.error("Error in createDevMentor:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'Failed to create mentor'
+      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Failed to create mentor",
     };
   }
 };
@@ -162,31 +169,31 @@ export const createDevAdmin = async (adminData: DevAdminData) => {
       mobile_number: adminData.mobile_number || null,
       password: hashedPassword,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
-      .from('admin')
+      .from("admin")
       .insert(adminToInsert)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating admin:', error);
+      console.error("Error creating admin:", error);
       throw new Error(`Failed to create admin: ${error.message}`);
     }
 
     return {
       success: true,
       data,
-      message: 'Admin created successfully'
+      message: "Admin created successfully",
     };
   } catch (error) {
-    console.error('Error in createDevAdmin:', error);
+    console.error("Error in createDevAdmin:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'Failed to create admin'
+      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Failed to create admin",
     };
   }
 };
@@ -205,50 +212,54 @@ export const createDevSubAdmin = async (subAdminData: DevSubAdminData) => {
       password: hashedPassword,
       is_deleted: false,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
-      .from('sub_admin')
+      .from("sub_admin")
       .insert(subAdminToInsert)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating sub admin:', error);
+      console.error("Error creating sub admin:", error);
       throw new Error(`Failed to create sub admin: ${error.message}`);
     }
 
     return {
       success: true,
       data,
-      message: 'Sub Admin created successfully'
+      message: "Sub Admin created successfully",
     };
   } catch (error) {
-    console.error('Error in createDevSubAdmin:', error);
+    console.error("Error in createDevSubAdmin:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'Failed to create sub admin'
+      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Failed to create sub admin",
     };
   }
 };
 
 // Utility to assign mentor to student
-export const assignMentorToStudent = async (studentId: string, mentorId: string, meetingLink?: string) => {
+export const assignMentorToStudent = async (
+  studentId: string,
+  mentorId: string,
+  meetingLink?: string,
+) => {
   try {
     // Check if student already has an active mentor
     const { data: existingAssignment } = await supabase
-      .from('assigned_mentor')
-      .select('*')
-      .eq('student_id', studentId)
-      .eq('status', 'ACTIVE')
+      .from("assigned_mentor")
+      .select("*")
+      .eq("student_id", studentId)
+      .eq("status", "ACTIVE")
       .single();
 
     if (existingAssignment) {
       return {
         success: false,
-        message: 'Student already has an active mentor assigned'
+        message: "Student already has an active mentor assigned",
       };
     }
 
@@ -256,74 +267,74 @@ export const assignMentorToStudent = async (studentId: string, mentorId: string,
       student_id: studentId,
       mentor_id: mentorId,
       meeting_link: meetingLink || null,
-      status: 'ACTIVE' as const,
-      meeting_status: 'SCHEDULED' as const,
-      assigned_at: new Date().toISOString()
+      status: "ACTIVE" as const,
+      meeting_status: "SCHEDULED" as const,
+      assigned_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
-      .from('assigned_mentor')
+      .from("assigned_mentor")
       .insert(assignmentData)
       .select()
       .single();
 
     if (error) {
-      console.error('Error assigning mentor:', error);
+      console.error("Error assigning mentor:", error);
       throw new Error(`Failed to assign mentor: ${error.message}`);
     }
 
     return {
       success: true,
       data,
-      message: 'Mentor assigned successfully'
+      message: "Mentor assigned successfully",
     };
   } catch (error) {
-    console.error('Error in assignMentorToStudent:', error);
+    console.error("Error in assignMentorToStudent:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'Failed to assign mentor'
+      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Failed to assign mentor",
     };
   }
 };
 
 // Utility to create a test for a student
 export const createTestForStudent = async (
-  studentId: string, 
-  testType: string, 
-  testStructure: any = {}
+  studentId: string,
+  testType: string,
+  testStructure: any = {},
 ) => {
   try {
     const testData = {
       student_id: studentId,
       test_type: testType,
       test_structure: testStructure,
-      status: 'PENDING' as const,
-      assigned_at: new Date().toISOString()
+      status: "PENDING" as const,
+      assigned_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
-      .from('tests')
+      .from("tests")
       .insert(testData)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating test:', error);
+      console.error("Error creating test:", error);
       throw new Error(`Failed to create test: ${error.message}`);
     }
 
     return {
       success: true,
       data,
-      message: 'Test created successfully'
+      message: "Test created successfully",
     };
   } catch (error) {
-    console.error('Error in createTestForStudent:', error);
+    console.error("Error in createTestForStudent:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'Failed to create test'
+      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Failed to create test",
     };
   }
 };
@@ -331,12 +342,28 @@ export const createTestForStudent = async (
 // Utility to get all data for debugging
 export const getAllDevData = async () => {
   try {
-    const [studentsRes, mentorsRes, adminsRes, subAdminsRes] = await Promise.all([
-      supabase.from('students').select('uuid, first_name, last_name, email, mobile_number, created_at').order('created_at', { ascending: false }),
-      supabase.from('mentor').select('uuid, mentor_name, email, mobile_number, created_at').order('created_at', { ascending: false }),
-      supabase.from('admin').select('uuid, user_id, name, mobile_number, created_at').order('created_at', { ascending: false }),
-      supabase.from('sub_admin').select('uuid, name, email, mobile_number, created_at').eq('is_deleted', false).order('created_at', { ascending: false })
-    ]);
+    const [studentsRes, mentorsRes, adminsRes, subAdminsRes] =
+      await Promise.all([
+        supabase
+          .from("students")
+          .select(
+            "uuid, first_name, last_name, email, mobile_number, created_at",
+          )
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("mentor")
+          .select("uuid, mentor_name, email, mobile_number, created_at")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("admin")
+          .select("uuid, user_id, name, mobile_number, created_at")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("sub_admin")
+          .select("uuid, name, email, mobile_number, created_at")
+          .eq("is_deleted", false)
+          .order("created_at", { ascending: false }),
+      ]);
 
     return {
       success: true,
@@ -344,47 +371,71 @@ export const getAllDevData = async () => {
         students: studentsRes.data || [],
         mentors: mentorsRes.data || [],
         admins: adminsRes.data || [],
-        subAdmins: subAdminsRes.data || []
-      }
+        subAdmins: subAdminsRes.data || [],
+      },
     };
   } catch (error) {
-    console.error('Error getting all dev data:', error);
+    console.error("Error getting all dev data:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 };
 
 // Utility to clean up test data (use with caution!)
 export const cleanupTestData = async (confirmationText: string) => {
-  if (confirmationText !== 'DELETE_ALL_TEST_DATA') {
+  if (confirmationText !== "DELETE_ALL_TEST_DATA") {
     return {
       success: false,
-      message: 'Invalid confirmation text. Data not deleted.'
+      message: "Invalid confirmation text. Data not deleted.",
     };
   }
 
   try {
     // Delete in order to respect foreign key constraints
-    await supabase.from('test_results').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('tests').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('assigned_mentor').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('ai_horoscope').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('students').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('mentor').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('admin').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('sub_admin').delete().neq('uuid', '00000000-0000-0000-0000-000000000000');
+    await supabase
+      .from("test_results")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
+    await supabase
+      .from("tests")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
+    await supabase
+      .from("assigned_mentor")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
+    await supabase
+      .from("ai_horoscope")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
+    await supabase
+      .from("students")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
+    await supabase
+      .from("mentor")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
+    await supabase
+      .from("admin")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
+    await supabase
+      .from("sub_admin")
+      .delete()
+      .neq("uuid", "00000000-0000-0000-0000-000000000000");
 
     return {
       success: true,
-      message: 'All test data cleaned up successfully'
+      message: "All test data cleaned up successfully",
     };
   } catch (error) {
-    console.error('Error cleaning up test data:', error);
+    console.error("Error cleaning up test data:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 };
