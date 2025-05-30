@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { 
   Users, GraduationCap, UserCheck, TrendingUp, 
   Search, Filter, Eye, ArrowLeft, AlertCircle,
-  CheckCircle, Calendar, Mail, Phone, MapPin, Award
+  CheckCircle, Calendar, Mail, Phone, MapPin, Award,
+  Shield, Bell, Settings, Plus, BookOpen, BarChart3, Clock
 } from "lucide-react";
 import { StudentProfile, StudentProfileData } from "@/src/components/shared/StudentProfile";
 
