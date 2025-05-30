@@ -29,6 +29,7 @@ interface AssignedStudent {
   status: string;
   meeting_status: string;
   meeting_link: string;
+  assigned_at: string;
   student: {
     uuid: string;
     first_name: string;
@@ -50,14 +51,9 @@ export default function MentorDashboard() {
   const [mentor, setMentor] = useState<MentorProfile | null>(null);
   const [assignedStudents, setAssignedStudents] = useState<AssignedStudent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mentorId, setMentorId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMentorProfile();
-    // In a real app, you'd get the mentor ID from auth context
-    const mockMentorId = "mentor-uuid-1"; // Replace with actual auth
-    setMentorId(mockMentorId);
-    fetchAssignedStudents(mockMentorId);
   }, []);
 
   const fetchMentorProfile = async () => {
@@ -77,6 +73,10 @@ export default function MentorDashboard() {
       if (response.ok) {
         const data = await response.json();
         setMentor(data.mentor);
+        
+        // Fetch assigned students using mentor UUID
+        await fetchAssignedStudents(data.mentor.uuid);
+        
         toast.success(`Welcome ${data.mentor.mentor_name}! Ready to guide your students?`);
       } else {
         window.location.href = '/mentor/auth';
@@ -89,10 +89,17 @@ export default function MentorDashboard() {
 
   const fetchAssignedStudents = async (mentorId: string) => {
     try {
-      const res = await fetch(`/api/mentor/students/${mentorId}`);
+      const res = await fetch(`/api/mentor/students/${mentorId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
       if (res.ok) {
         const data = await res.json();
-        setAssignedStudents(data.students);
+        setAssignedStudents(data.students || []);
+      } else {
+        console.error('Failed to fetch assigned students');
       }
     } catch (error) {
       console.error('Error fetching assigned students:', error);
@@ -102,20 +109,25 @@ export default function MentorDashboard() {
     }
   };
 
-  const allowViewResults = async (studentId: string) => {
+  const verifyHoroscope = async (studentId: string) => {
     try {
-      const res = await fetch('/api/mentor/allow-results', {
+      const res = await fetch('/api/mentor/verify-horoscope', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId, mentorId })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ studentId, mentorId: mentor?.uuid })
       });
 
       if (res.ok) {
-        toast.success('Student can now view test results');
-        if (mentorId) fetchAssignedStudents(mentorId);
+        toast.success('Horoscope verified successfully');
+        if (mentor?.uuid) fetchAssignedStudents(mentor.uuid);
+      } else {
+        toast.error('Failed to verify horoscope');
       }
     } catch (error) {
-      toast.error('Failed to update permissions');
+      toast.error('Failed to verify horoscope');
     }
   };
 
@@ -127,13 +139,16 @@ export default function MentorDashboard() {
     try {
       const res = await fetch('/api/mentor/complete-meeting', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify({ assignmentId })
       });
 
       if (res.ok) {
         toast.success('Meeting marked as completed');
-        if (mentorId) fetchAssignedStudents(mentorId);
+        if (mentor?.uuid) fetchAssignedStudents(mentor.uuid);
       }
     } catch (error) {
       toast.error('Failed to update meeting status');
@@ -272,113 +287,99 @@ export default function MentorDashboard() {
         {/* Students Grid */}
         <div className="mb-6">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">Your Students</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {assignedStudents.map((assignment) => (
-              <div key={assignment.uuid} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-                <div className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                      {assignment.student.first_name?.[0]}{assignment.student.last_name?.[0]}
-                    </div>
-                    <div className="ml-3 flex-1">
-                      <h3 className="font-semibold text-lg text-gray-800">
-                        {assignment.student.first_name} {assignment.student.last_name}
-                      </h3>
-                      <p className="text-sm text-gray-500 truncate">{assignment.student.email}</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 mb-4">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-500">Level:</span>
-                      <span className="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                        {assignment.student.lvl || 'Not set'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-500">Status:</span>
-                      <span className={`font-medium px-2 py-1 rounded-full text-xs ${
-                        assignment.student.onboardingcompleted 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-orange-100 text-orange-800'
-                      }`}>
-                        {assignment.student.onboardingcompleted ? 'Active' : 'Pending'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-500">Meeting:</span>
-                      <span className={`font-medium px-2 py-1 rounded-full text-xs ${
-                        assignment.meeting_status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                        assignment.meeting_status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' : 
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {assignment.meeting_status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    {assignment.meeting_status === 'SCHEDULED' && (
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => scheduleMeeting(assignment.uuid)}
-                          className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
-                        >
-                          <Video className="h-4 w-4" />
-                          Schedule
-                        </button>
-                        <button
-                          onClick={() => markMeetingCompleted(assignment.uuid)}
-                          className="flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                          Complete
-                        </button>
+          {assignedStudents.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {assignedStudents.map((assignment) => (
+                <div key={assignment.uuid} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
+                  <div className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {assignment.student.first_name?.[0]}{assignment.student.last_name?.[0]}
                       </div>
-                    )}
-                    
-                    <button
-                      onClick={() => allowViewResults(assignment.student.uuid)}
-                      className={`w-full flex items-center justify-center gap-1 px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                        assignment.meeting_status === 'COMPLETED' 
-                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
-                          : 'bg-purple-50 text-purple-600 hover:bg-purple-100'
-                      }`}
-                      disabled={assignment.meeting_status === 'COMPLETED'}
-                    >
-                      {assignment.meeting_status === 'COMPLETED' ? (
-                        <>
-                          <Eye className="h-4 w-4" />
-                          Results Accessible
-                        </>
-                      ) : (
-                        <>
-                          <EyeOff className="h-4 w-4" />
-                          Allow Results
-                        </>
-                      )}
-                    </button>
+                      <div className="ml-3 flex-1">
+                        <h3 className="font-semibold text-lg text-gray-800">
+                          {assignment.student.first_name} {assignment.student.last_name}
+                        </h3>
+                        <p className="text-sm text-gray-500 truncate">{assignment.student.email}</p>
+                      </div>
+                    </div>
 
-                    <button className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium">
-                      <MessageSquare className="h-4 w-4" />
-                      Send Message
-                    </button>
+                    <div className="space-y-3 mb-4">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Level:</span>
+                        <span className="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                          {assignment.student.lvl || 'Not set'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Status:</span>
+                        <span className={`font-medium px-2 py-1 rounded-full text-xs ${
+                          assignment.student.onboardingcompleted 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {assignment.student.onboardingcompleted ? 'Active' : 'Pending'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Meeting:</span>
+                        <span className={`font-medium px-2 py-1 rounded-full text-xs ${
+                          assignment.meeting_status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                          assignment.meeting_status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {assignment.meeting_status}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      {assignment.meeting_status === 'SCHEDULED' && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => scheduleMeeting(assignment.uuid)}
+                            className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+                          >
+                            <Video className="h-4 w-4" />
+                            Schedule
+                          </button>
+                          <button
+                            onClick={() => markMeetingCompleted(assignment.uuid)}
+                            className="flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                            Complete
+                          </button>
+                        </div>
+                      )}
+                      
+                      <button
+                        onClick={() => verifyHoroscope(assignment.student.uuid)}
+                        className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+                      >
+                        <Eye className="h-4 w-4" />
+                        Verify Horoscope
+                      </button>
+
+                      <button className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium">
+                        <MessageSquare className="h-4 w-4" />
+                        Send Message
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {assignedStudents.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <GraduationCap className="h-8 w-8 text-gray-400" />
+              ))}
             </div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">No students assigned</h3>
-            <p className="text-gray-500">Students will appear here when assigned by an admin</p>
-          </div>
-        )}
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GraduationCap className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-800 mb-2">No students assigned</h3>
+              <p className="text-gray-500">Students will appear here when assigned by an admin</p>
+            </div>
+          )}
+        </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -413,7 +414,7 @@ export default function MentorDashboard() {
               </div>
               <div className="flex items-center gap-3 p-2">
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Results approved</span>
+                <span className="text-sm text-gray-600">Horoscope verified</span>
               </div>
             </div>
           </div>

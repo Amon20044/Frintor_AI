@@ -7,7 +7,8 @@ import {
   Sparkles, Award, TrendingUp, Users, Lightbulb, Search, Filter,
   Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Info,
   Briefcase, Heart, Eye, Zap, Shield, Crown, Compass, Moon, Sun,
-  ArrowRight, Play, FileText, BarChart3, Menu, Bell, Settings
+  ArrowRight, Play, FileText, BarChart3, Menu, Bell, Settings,
+  UserCheck, MessageCircle, Video
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -20,8 +21,31 @@ interface StudentProfile {
   onboardingcompleted: boolean;
 }
 
+interface AssignedMentor {
+  uuid: string;
+  student_id: string;
+  mentor_id: string;
+  status: string;
+  meeting_status: string;
+  meeting_link: string;
+  assigned_at: string;
+  mentor: {
+    uuid: string;
+    mentor_name: string;
+    email: string;
+    mobile_number: string;
+  };
+}
+
+interface HoroscopeStatus {
+  exists: boolean;
+  verified: boolean;
+}
+
 function Page() {
   const [student, setStudent] = useState<StudentProfile | null>(null);
+  const [assignedMentor, setAssignedMentor] = useState<AssignedMentor | null>(null);
+  const [horoscopeStatus, setHoroscopeStatus] = useState<HoroscopeStatus>({ exists: false, verified: false });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,6 +69,13 @@ function Page() {
       if (response.ok) {
         const data = await response.json();
         setStudent(data.student);
+        
+        // Fetch mentor assignment status
+        await fetchMentorAssignment(data.student.uuid);
+        
+        // Fetch horoscope verification status
+        await fetchHoroscopeStatus(data.student.uuid);
+        
         toast.success(`Welcome ${data.student.first_name}! Ready to explore your potential?`);
       } else {
         window.location.href = '/student/auth';
@@ -54,6 +85,40 @@ function Page() {
       window.location.href = '/student/auth';
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMentorAssignment = async (studentId: string) => {
+    try {
+      const response = await fetch(`/api/student/mentor-assignment/${studentId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAssignedMentor(data.mentor);
+      }
+    } catch (error) {
+      console.error('Error fetching mentor assignment:', error);
+    }
+  };
+
+  const fetchHoroscopeStatus = async (studentId: string) => {
+    try {
+      const response = await fetch(`/api/student/horoscope-status/${studentId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHoroscopeStatus(data.status);
+      }
+    } catch (error) {
+      console.error('Error fetching horoscope status:', error);
     }
   };
 
@@ -184,15 +249,83 @@ function Page() {
                     </div>
                   </div>
 
-                  <a 
-                    href="/student/horoscope"
-                    className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 font-medium text-sm"
-                  >
-                    <Star className="h-4 w-4" />
-                    View Horoscope
-                  </a>
+                  {horoscopeStatus.exists && horoscopeStatus.verified ? (
+                    <a 
+                      href="/student/horoscope"
+                      className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 font-medium text-sm"
+                    >
+                      <Star className="h-4 w-4" />
+                      View Horoscope
+                    </a>
+                  ) : horoscopeStatus.exists && !horoscopeStatus.verified ? (
+                    <div className="w-full px-4 py-3 bg-orange-50 border border-orange-200 text-orange-700 rounded-lg text-center text-sm">
+                      <Clock className="h-4 w-4 inline mr-2" />
+                      Pending Mentor Verification
+                    </div>
+                  ) : (
+                    <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-600 rounded-lg text-center text-sm">
+                      <AlertCircle className="h-4 w-4 inline mr-2" />
+                      Horoscope Not Generated Yet
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
+
+            {/* Mentor Assignment Section */}
+            <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <UserCheck className="h-5 w-5 text-green-600" />
+                Your Mentor
+              </h3>
+              
+              {assignedMentor ? (
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {assignedMentor.mentor.mentor_name.charAt(0)}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{assignedMentor.mentor.mentor_name}</h4>
+                        <p className="text-sm text-gray-600">{assignedMentor.mentor.email}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            assignedMentor.meeting_status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                            assignedMentor.meeting_status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' : 
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {assignedMentor.meeting_status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                        <MessageCircle className="h-4 w-4" />
+                      </button>
+                      {assignedMentor.meeting_link && (
+                        <a 
+                          href={assignedMentor.meeting_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
+                        >
+                          <Video className="h-4 w-4" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+                  <UserCheck className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-600 font-medium">No mentor assigned yet</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    A mentor will be assigned to you soon to help guide your career journey.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Progress Overview */}
@@ -204,15 +337,35 @@ function Page() {
                   <p className="text-sm font-medium text-green-800">Profile Setup</p>
                   <p className="text-xs text-green-600">Completed</p>
                 </div>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <Clock className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-orange-800">Assessment</p>
-                  <p className="text-xs text-orange-600">Pending</p>
+                <div className={`text-center p-4 rounded-lg ${
+                  assignedMentor ? 'bg-green-50' : 'bg-orange-50'
+                }`}>
+                  {assignedMentor ? (
+                    <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                  ) : (
+                    <Clock className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                  )}
+                  <p className={`text-sm font-medium ${
+                    assignedMentor ? 'text-green-800' : 'text-orange-800'
+                  }`}>Mentor Assignment</p>
+                  <p className={`text-xs ${
+                    assignedMentor ? 'text-green-600' : 'text-orange-600'
+                  }`}>{assignedMentor ? 'Assigned' : 'Pending'}</p>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <Target className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-800">Mentorship</p>
-                  <p className="text-xs text-gray-600">Not Started</p>
+                <div className={`text-center p-4 rounded-lg ${
+                  horoscopeStatus.verified ? 'bg-green-50' : 'bg-gray-50'
+                }`}>
+                  {horoscopeStatus.verified ? (
+                    <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                  ) : (
+                    <Target className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                  )}
+                  <p className={`text-sm font-medium ${
+                    horoscopeStatus.verified ? 'text-green-800' : 'text-gray-800'
+                  }`}>Horoscope</p>
+                  <p className={`text-xs ${
+                    horoscopeStatus.verified ? 'text-green-600' : 'text-gray-600'
+                  }`}>{horoscopeStatus.verified ? 'Verified' : 'Pending'}</p>
                 </div>
               </div>
             </div>
@@ -247,7 +400,7 @@ function Page() {
               <div className="space-y-3">
                 <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                   <FileText className="h-5 w-5 text-blue-600" />
-                  <span className="text-sm font-medium">View Results</span>
+                  <span className="text-sm font-medium">View Test History</span>
                 </button>
                 <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                   <Calendar className="h-5 w-5 text-green-600" />
@@ -268,10 +421,18 @@ function Page() {
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span className="text-sm text-gray-600">Account created</span>
                 </div>
-                <div className="flex items-center gap-3 p-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Profile updated</span>
-                </div>
+                {assignedMentor && (
+                  <div className="flex items-center gap-3 p-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">Mentor assigned</span>
+                  </div>
+                )}
+                {horoscopeStatus.verified && (
+                  <div className="flex items-center gap-3 p-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">Horoscope verified</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -286,8 +447,8 @@ function Page() {
           </div>
           <h3 className="text-2xl font-bold mb-3">Ready to Discover Your Potential?</h3>
           <p className="text-lg mb-6 text-white/90 max-w-2xl mx-auto">
-            Take the first step towards understanding yourself better. Complete both assessments 
-            to get a comprehensive view of your personality and cosmic blueprint.
+            Take the first step towards understanding yourself better. Complete your assessments 
+            and connect with your mentor for comprehensive guidance.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
@@ -297,13 +458,12 @@ function Page() {
               <Brain className="h-5 w-5" />
               Start Assessment
             </a>
-            <a 
-              href="/student/horoscope"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-semibold backdrop-blur-sm border border-white/30"
-            >
-              <Moon className="h-5 w-5" />
-              View Horoscope
-            </a>
+            {assignedMentor && (
+              <button className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-semibold backdrop-blur-sm border border-white/30">
+                <MessageCircle className="h-5 w-5" />
+                Contact Mentor
+              </button>
+            )}
           </div>
         </div>
       </div>
