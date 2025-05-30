@@ -18,10 +18,13 @@ export default function AdminAuth() {
   } = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
   });
-  console.log(watch());
-  const onSubmit = async (data: LoginData) => {
-    setIsPending(true);
 
+  console.log(watch());
+  
+  const onSubmit = async (data: LoginData) => {
+    console.log("Form submitted with data");
+    setIsPending(true);
+    console.log("Submitting admin login with data:", data);
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",

@@ -5,18 +5,18 @@ import { jwt } from '@/utils/signJwt';
 import * as argon2 from 'argon2';
 
 export async function POST(req: NextRequest) {
+  console.log('Received adminID:');
   try {
-    const { user_id, password } = await req.json();
-
-    if (!user_id || !password) {
+    const { adminID, password } = await req.json();
+    if (!adminID || !password) {
       return NextResponse.json(
         { message: 'User ID and password are required' },
         { status: 400 }
       );
     }
 
-    const admin = await getAdminByUserId(user_id);
-    
+    const admin = await getAdminByUserId(adminID);
+
     if (!admin) {
       return NextResponse.json(
         { message: 'Invalid credentials' },
