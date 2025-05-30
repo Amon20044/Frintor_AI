@@ -6,16 +6,16 @@ import * as argon2 from 'argon2';
 
 export async function POST(req: NextRequest) {
   try {
-    const { user_id, password } = await req.json();
+    const { adminID, password } = await req.json();
 
-    if (!user_id || !password) {
+    if (!adminID || !password) {
       return NextResponse.json(
-        { message: 'User ID and password are required' },
+        { message: 'Admin ID and password are required' },
         { status: 400 }
       );
     }
 
-    const admin = await getAdminByUserId(user_id);
+    const admin = await getAdminByUserId(adminID);
     if (!admin) {
       return NextResponse.json(
         { message: 'Invalid credentials' },
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const token = await jwt({ uuid: admin.uuid, user_id: admin.user_id });
+    const token = await jwt({ uuid: admin.uuid, adminID: admin.user_id });
 
     return NextResponse.json({
       message: 'Admin logged in successfully',
