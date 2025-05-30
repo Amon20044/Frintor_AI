@@ -1,4 +1,3 @@
-
 'use client'
 import React, { useEffect, useState } from 'react';
 import { 
@@ -75,16 +74,16 @@ function Page() {
       if (response.ok) {
         const data = await response.json();
         setStudent(data.student);
-        
+
         // Fetch mentor assignment status
         await fetchMentorAssignment(data.student.uuid);
-        
+
         // Fetch horoscope verification status
         await fetchHoroscopeStatus(data.student.uuid);
-        
+
         // Fetch test status
         await fetchTestStatus(data.student.uuid);
-        
+
         toast.success(`Welcome ${data.student.first_name}! Ready to explore your potential?`);
       } else {
         window.location.href = '/student/auth';
@@ -97,20 +96,25 @@ function Page() {
     }
   };
 
-  const fetchMentorAssignment = async (studentId: string) => {
+  const fetchAssignedMentor = async (studentId: string) => {
     try {
-      const response = await fetch(`/api/student/mentor-assignment/${studentId}`, {
+      const res = await fetch(`/api/student/mentor-assignment/${studentId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setAssignedMentor(data.mentor);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.mentor) {
+          setAssignedMentor(data.mentor);
+        } else {
+          setAssignedMentor(null);
+        }
       }
     } catch (error) {
-      console.error('Error fetching mentor assignment:', error);
+      console.error('Error fetching assigned mentor:', error);
+      setAssignedMentor(null);
     }
   };
 
@@ -233,7 +237,7 @@ function Page() {
                       <p className="text-sm text-gray-600">AI-Powered Analysis</p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <CheckCircle className="h-4 w-4 text-green-500" />
@@ -267,7 +271,7 @@ function Page() {
                       <p className="text-sm text-gray-600">Cosmic Insights</p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <CheckCircle className="h-4 w-4 text-green-500" />
@@ -311,7 +315,7 @@ function Page() {
                 <Brain className="h-5 w-5 text-purple-600" />
                 Psychometric Analysis
               </h3>
-              
+
               {testStatus.exists && testStatus.status === 'COMPLETED' ? (
                 <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                   <div className="flex items-center gap-4">
@@ -387,7 +391,7 @@ function Page() {
                 <UserCheck className="h-5 w-5 text-blue-600" />
                 Mentor Assignment
               </h3>
-              
+
               {assignedMentor ? (
                 <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                   <div className="flex items-center gap-4">

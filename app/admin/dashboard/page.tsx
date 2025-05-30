@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -315,6 +314,23 @@ export default function AdminDashboard() {
 
         {/* Students Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-blue-100 rounded-lg p-3">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <span className="text-2xl font-bold text-gray-900">{stats.totalStudents}</span>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Students</h3>
+            <p className="text-gray-600 text-sm">Registered students in the system</p>
+            <button 
+              onClick={() => window.location.href = '/admin/assign-mentor'}
+              className="mt-3 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+            >
+              <UserCheck className="h-4 w-4" />
+              Manage Assignments
+            </button>
+          </div>
           {filteredStudents.map((student) => (
             <div key={student.uuid} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
               <div className="p-6">
