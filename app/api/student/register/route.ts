@@ -50,11 +50,10 @@ export async function POST(req: NextRequest) {
 
     // Handle Supabase duplicate email error
     if (
-      error.code === '23505' ||
       (error.message && error.message.includes('duplicate key value violates unique constraint'))
     ) {
       return NextResponse.json(
-        { message: 'Email already registered' },
+        { message: 'Mobile or Email already registered' },
         { status: 409 }
       );
     }

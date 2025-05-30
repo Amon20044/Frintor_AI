@@ -19,7 +19,7 @@ export default function RegisterForm() {
   } = useForm<RegisterData>({
     resolver: zodResolver(registerSchema),
   });
-
+  
   const registerStudent = async (data: RegisterData) => {
     try {
       console.log("Initiating register request with email:", data.email);

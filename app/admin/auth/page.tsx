@@ -14,10 +14,11 @@ export default function AdminAuth() {
     handleSubmit,
     formState: { errors },
     setError,
+    watch
   } = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
   });
-
+  console.log(watch());
   const onSubmit = async (data: LoginData) => {
     setIsPending(true);
 
