@@ -23,7 +23,7 @@ export default function RegisterForm() {
   const registerStudent = async (data: RegisterData) => {
     try {
       console.log("Initiating register request with email:", data.email);
-      const res = await fetch("/api/student/auth", {
+      const res = await fetch("/api/student/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

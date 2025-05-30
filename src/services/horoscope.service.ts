@@ -21,7 +21,7 @@ export class HoroscopeService {
 
   static async getHoroscope(uuid: string): Promise<HoroscopeData> {
     try {
-      const response = await this.makeRequest(`/student/api/getHoroscope/${uuid}`, {
+      const response = await this.makeRequest(`/api/student/getHoroscope/${uuid}`, {
         method: 'GET',
       });
       

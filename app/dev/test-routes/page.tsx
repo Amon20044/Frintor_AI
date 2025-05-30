@@ -87,16 +87,16 @@ export default function RouteTestPage() {
     
     const testCases = [
       // Student routes
-      { endpoint: '/student/api/register', method: 'POST', data: testData.student.register },
-      { endpoint: '/student/api/login', method: 'POST', data: testData.student.login },
+      { endpoint: '/api/student/register', method: 'POST', data: testData.student.register },
+      { endpoint: '/api/student/login', method: 'POST', data: testData.student.login },
       
       // Mentor routes
-      { endpoint: '/mentor/api/register', method: 'POST', data: testData.mentor.register },
-      { endpoint: '/mentor/api/login', method: 'POST', data: testData.mentor.login },
+      { endpoint: '/api/mentor/register', method: 'POST', data: testData.mentor.register },
+      { endpoint: '/api/mentor/login', method: 'POST', data: testData.mentor.login },
       
       // Admin routes
-      { endpoint: '/admin/api/register', method: 'POST', data: testData.admin.register },
-      { endpoint: '/admin/api/login', method: 'POST', data: testData.admin.login },
+      { endpoint: '/api/admin/register', method: 'POST', data: testData.admin.register },
+      { endpoint: '/api/admin/login', method: 'POST', data: testData.admin.login },
     ];
 
     const testResults: TestResult[] = [];

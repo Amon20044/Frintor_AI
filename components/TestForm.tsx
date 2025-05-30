@@ -101,7 +101,7 @@ export default function TestForm({ params }: { params: { uuid: string } }) {
     };
     console.log('Submitting test result:', resultPayload);
     try {
-      const res = await fetch(`api/student/addStudentResponse/${testId}`, {
+      const res = await fetch(`/api/student/addStudentResponse/${testId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
