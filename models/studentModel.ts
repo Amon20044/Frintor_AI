@@ -1,4 +1,3 @@
-
 import supabase from "../database/db";
 import { Student } from "../types/student.types";
 import argon2 from "argon2";
@@ -71,35 +70,46 @@ export const logStudent = async (email: string, password: string): Promise<Stude
     return dataStudent;
 }
 
-export const onboardStudent = async (student: Student) => {
+export const onboardStudent = async (student: any): Promise<Student | null> => {
+  try {
+    console.log("Onboarding student:", student);
     const { data, error } = await supabase
-        .from("students")
-        .update({
-            age: student.age,
-            dateOfBirth: student.dateofbirth,
-            timeOfBirth: student.timeofbirth,
-            placeOfBirth: student.placeofbirth,
-            gender: student.gender,
-            education: student.education,
-            category: student.category,
-            birth_date: student.birth_date,
-            interest: student.interest,
-            lvl: student.lvl,
-            studentMetadata: student.studentmetadata,
-            preferences: student.preferences_settings,
-            onboardingCompleted: true,
-            updated_at: new Date().toISOString()
-        })
-        .eq('uuid', student.uuid)
-        .select()
-        .single();
+      .from("students")
+      .update({
+        first_name: student.first_name,
+        last_name: student.last_name,
+        age: student.age,
+        gender: student.gender,
+        dateOfBirth: student.dateOfBirth,
+        timeOfBirth: student.timeOfBirth,
+        placeOfBirth: student.placeOfBirth,
+        email: student.email,
+        mobile_number: student.mobile_number,
+        category: student.category,
+        lvl: student.lvl,
+        interest: student.interest,
+        education: student.education,
+        studentMetadata: student.studentMetadata,
+        preferences: student.preferences,
+        onboardingcompleted: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("uuid", student.uuid)
+      .select()
+      .single();
 
     if (error) {
-        throw new Error(error.message);
+      console.error("Error onboarding student:", error);
+      return null;
     }
 
-    return data;
-}
+    console.log("Student onboarded successfully:", data);
+    return data as Student;
+  } catch (error) {
+    console.error("Error in onboardStudent:", error);
+    return null;
+  }
+};
 
 export const getStudentById = async (uuid: string): Promise<Student | null> => {
     const { data, error } = await supabase

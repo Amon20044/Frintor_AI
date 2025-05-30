@@ -22,12 +22,97 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "UUID in body does not match token" }, { status: 403 });
     }
 
-    const student: Student = {
-      ...body,
+    // Organize data into proper database structure
+    const {
+      // Personal fields that go directly to student table
+      first_name,
+      last_name,
+      age,
+      gender,
+      dateOfBirth,
+      timeOfBirth,
+      placeOfBirth,
+      email,
+      mobile_number,
+      category,
+      lvl,
+      interest,
+      
+      // Academic details for education jsonb
+      tenth_percentage,
+      twelfth_percentage,
+      academic_background,
+      subject,
+      tenth_marksheet,
+      twelfth_marksheet,
+      other_certificate,
+      neet_marksheet,
+      
+      // Metadata for studentMetadata jsonb
+      permanent_address,
+      current_address,
+      father_name,
+      mother_name,
+      father_birth_date,
+      mother_birth_date,
+      father_contact,
+      mother_contact,
+      
+      // Preferences for preferences jsonb
+      preferences,
+      career_goals,
+      
+      ...rest
+    } = body;
+
+    // Process interests into array
+    const interestArray = interest ? interest.split(',').map((i: string) => i.trim()) : [];
+
+    // Organize data
+    const studentData = {
       uuid: studentIdFromToken,
+      first_name,
+      last_name,
+      age,
+      gender,
+      dateOfBirth,
+      timeOfBirth,
+      placeOfBirth,
+      email,
+      mobile_number,
+      category,
+      lvl,
+      interest: interestArray,
+      education: {
+        tenth_percentage,
+        twelfth_percentage,
+        academic_background,
+        subject,
+        tenth_marksheet,
+        twelfth_marksheet,
+        other_certificate,
+        neet_marksheet
+      },
+      studentMetadata: {
+        permanent_address,
+        current_address,
+        full_parents_details: {
+          father_name,
+          mother_name,
+          father_birth_date,
+          mother_birth_date,
+          father_contact,
+          mother_contact
+        }
+      },
+      preferences: {
+        preferences,
+        career_goals
+      },
+      ...rest
     };
 
-    const result = await onboardStudent(student);
+    const result = await onboardStudent(studentData);
 
     // 🔥 Non-blocking background task
     const endpoint = `https://frintor-ai-487976053532.asia-south1.run.app/test/${studentIdFromToken}`;

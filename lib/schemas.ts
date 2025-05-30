@@ -23,38 +23,47 @@ export const registerSchema = z
   });
 
 export const onboardingSchema = z.object({
+  // Personal Details
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
   age: z.string().min(1, "Age is required"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  timeOfBirth: z.string().min(1, "Time of birth is required"),
-  placeOfBirth: z.string().min(1, "Place of birth is required"),
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
     required_error: "Gender is required",
   }),
-  category: z.string().min(1, "Category is required"),
-  interest: z.array(z.string()).min(1, "At least one interest is required"),
-  lvl: z.enum(
-    [
-      "MID_SCHOOL",
-      "HIGH_SCHOOL",
-      "UNDERGRADUATE",
-      "POSTGRADUATE",
-      "WORKING_PROFESSIONAL",
-    ],
-    {
-      required_error: "Level is required",
-    },
-  ),
-  education: z.string().min(1, "Education is required"),
-  studentMetadata: z
-    .array(
-      z.object({
-        field: z.string(),
-        marks: z.string(),
-        classOrLevel: z.string(),
-        customFields: z.array(z.any()).optional(),
-      }),
-    )
-    .optional(),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  timeOfBirth: z.string().optional(),
+  placeOfBirth: z.string().min(1, "Place of birth is required"),
+  email: z.string().optional(),
+  mobile_number: z.string().optional(),
+  category: z.string().optional(),
+  permanent_address: z.string().optional(),
+  current_address: z.string().optional(),
+
+  // Academic Details
+  lvl: z.enum(["MID_SCHOOL", "HIGH_SCHOOL", "UNDERGRADUATE", "POSTGRADUATE", "WORKING_PROFESSIONAL"], {
+    required_error: "Education level is required",
+  }),
+  tenth_percentage: z.string().optional(),
+  twelfth_percentage: z.string().optional(),
+  academic_background: z.string().optional(),
+  subject: z.string().optional(),
+  tenth_marksheet: z.string().optional(),
+  twelfth_marksheet: z.string().optional(),
+  other_certificate: z.string().optional(),
+  neet_marksheet: z.string().optional(),
+
+  // Preferences & Interests
+  interest: z.string().min(1, "Interests are required"),
+  preferences: z.string().optional(),
+  career_goals: z.string().optional(),
+
+  // Parent's Details
+  father_name: z.string().optional(),
+  mother_name: z.string().optional(),
+  father_birth_date: z.string().optional(),
+  mother_birth_date: z.string().optional(),
+  father_contact: z.string().optional(),
+  mother_contact: z.string().optional(),
 });
 
 // Test schemas
