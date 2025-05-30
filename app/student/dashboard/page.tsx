@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface StudentProfile {
+interface StudentProfileData {
   uuid: string;
   first_name: string;
   last_name: string;
@@ -46,8 +46,72 @@ interface TestStatus {
   status: string;
 }
 
+// Reusable StudentProfile component
+interface StudentProfileProps {
+  student: StudentProfileData;
+  variant: 'card' | 'summary';
+  showActions: boolean;
+}
+
+const StudentProfile: React.FC<StudentProfileProps> = ({ student, variant, showActions }) => {
+  if (variant === 'card') {
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <User className="h-5 w-5 text-blue-600" />
+          Profile Overview
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
+              {student.first_name?.charAt(0)}{student.last_name?.charAt(0)}
+            </div>
+            <div>
+              <h4 className="text-xl font-semibold text-gray-900">
+                {student.first_name} {student.last_name}
+              </h4>
+              <p className="text-gray-600">{student.email}</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Academic Level:</span>
+              <span className="font-medium text-gray-900">{student.lvl}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Onboarding:</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                student.onboardingcompleted ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+              }`}>
+                {student.onboardingcompleted ? 'Complete' : 'Pending'}
+              </span>
+            </div>
+          </div>
+        </div>
+        {showActions && (
+          <div className="mt-4">
+            {/* Add action buttons here if needed */}
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Edit Profile
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  } else {
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-4">
+        <h4 className="text-lg font-semibold text-gray-900">{student.first_name} {student.last_name}</h4>
+        <p className="text-gray-600">{student.email}</p>
+        <p className="text-sm text-gray-600">Level: {student.lvl || 'Not set'}</p>
+      </div>
+    );
+  }
+};
+
 function Page() {
-  const [student, setStudent] = useState<StudentProfile | null>(null);
+  const [student, setStudent] = useState<StudentProfileData | null>(null);
   const [assignedMentor, setAssignedMentor] = useState<AssignedMentor | null>(null);
   const [horoscopeStatus, setHoroscopeStatus] = useState<HoroscopeStatus>({ exists: false, verified: false });
   const [testStatus, setTestStatus] = useState<TestStatus>({ exists: false, status: 'PENDING' });
@@ -490,26 +554,22 @@ function Page() {
 
           {/* Right Column - Quick Info */}
           <div className="space-y-6">
-            {/* Profile Summary */}
-            <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Profile Summary</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Level:</span>
-                  <span className="text-sm font-medium">{student?.lvl || 'Not set'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Onboarding:</span>
-                  <span className={`text-sm font-medium ${student?.onboardingcompleted ? 'text-green-600' : 'text-orange-600'}`}>
-                    {student?.onboardingcompleted ? 'Complete' : 'Pending'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Email:</span>
-                  <span className="text-sm font-medium text-gray-800">{student?.email}</span>
+          {/* Student Profile Section */}
+          <div className="lg:col-span-1">
+            {student ? (
+              <StudentProfile
+                student={student as StudentProfileData}
+                variant="card"
+                showActions={false}
+              />
+            ) : (
+              <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
+                <div className="flex items-center justify-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
                 </div>
               </div>
-            </div>
+            )}
+          </div>
 
             {/* Quick Actions */}
             <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">

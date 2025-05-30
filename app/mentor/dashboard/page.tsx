@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { StudentProfile, StudentProfileData } from '@/src/components/shared/StudentProfile';
 import { 
   Users, 
   Calendar, 
@@ -154,6 +155,28 @@ export default function MentorDashboard() {
     }
   };
 
+  const handleCompleteMeeting = async (assignmentId: string) => {
+    try {
+      const res = await fetch('/api/mentor/complete-meeting', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('mentorToken')}`
+        },
+        body: JSON.stringify({ assignmentId })
+      });
+  
+      if (res.ok) {
+        toast.success('Meeting marked as completed');
+        if (mentor?.uuid) fetchAssignedStudents(mentor.uuid);
+      } else {
+        toast.error('Failed to update meeting status');
+      }
+    } catch (error) {
+      toast.error('Failed to update meeting status');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center">
@@ -289,82 +312,61 @@ export default function MentorDashboard() {
           {assignedStudents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {assignedStudents.map((assignment) => (
-                <div key={assignment.uuid} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-                  <div className="p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                        {assignment.student.first_name?.[0]}{assignment.student.last_name?.[0]}
-                      </div>
-                      <div className="ml-3 flex-1">
-                        <h3 className="font-semibold text-lg text-gray-800">
-                          {assignment.student.first_name} {assignment.student.last_name}
-                        </h3>
-                        <p className="text-sm text-gray-500 truncate">{assignment.student.email}</p>
-                      </div>
+                <div key={assignment.uuid} className="bg-white rounded-xl shadow-lg border border-green-100 p-6">
+                  <StudentProfile
+                    student={assignment.student as StudentProfileData}
+                    variant="compact"
+                    showActions={false}
+                    className="mb-4"
+                  />
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Assignment Status:</span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        assignment.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                      }`}>
+                        {assignment.status}
+                      </span>
                     </div>
-
-                    <div className="space-y-3 mb-4">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-500">Level:</span>
-                        <span className="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                          {assignment.student.lvl || 'Not set'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-500">Status:</span>
-                        <span className={`font-medium px-2 py-1 rounded-full text-xs ${
-                          assignment.student.onboardingcompleted 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-orange-100 text-orange-800'
-                        }`}>
-                          {assignment.student.onboardingcompleted ? 'Active' : 'Pending'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-500">Meeting:</span>
-                        <span className={`font-medium px-2 py-1 rounded-full text-xs ${
-                          assignment.meeting_status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                          assignment.meeting_status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' : 
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {assignment.meeting_status}
-                        </span>
-                      </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Meeting Status:</span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        assignment.meeting_status === 'COMPLETED' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {assignment.meeting_status}
+                      </span>
                     </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-sm">
+                        Assigned: {new Date(assignment.assigned_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
 
-                    <div className="space-y-2">
-                      {assignment.meeting_status === 'SCHEDULED' && (
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={() => scheduleMeeting(assignment.uuid)}
-                            className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
-                          >
-                            <Video className="h-4 w-4" />
-                            Schedule
-                          </button>
-                          <button
-                            onClick={() => markMeetingCompleted(assignment.uuid)}
-                            className="flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                            Complete
-                          </button>
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => verifyHoroscope(assignment.student.uuid)}
-                        className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+                  <div className="flex gap-2">
+                    <button className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors flex items-center justify-center gap-1">
+                      <MessageSquare className="h-4 w-4" />
+                      Contact
+                    </button>
+                    {assignment.meeting_link && (
+                      <a 
+                        href={assignment.meeting_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors flex items-center justify-center gap-1"
                       >
-                        <Eye className="h-4 w-4" />
-                        Verify Horoscope
-                      </button>
-
-                      <button className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium">
-                        <MessageSquare className="h-4 w-4" />
-                        Send Message
-                      </button>
-                    </div>
+                        <Video className="h-4 w-4" />
+                        Meeting
+                      </a>
+                    )}
+                    <button 
+                      onClick={() => handleCompleteMeeting(assignment.uuid)}
+                      className="px-3 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors"
+                    >
+                      Complete
+                    </button>
                   </div>
                 </div>
               ))}

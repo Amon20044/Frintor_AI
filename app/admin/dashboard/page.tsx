@@ -1,26 +1,13 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { 
-  Users, 
-  UserCheck, 
-  BookOpen, 
-  Award,
-  Eye,
-  UserPlus,
-  Search,
-  Filter,
-  Menu,
-  Bell,
-  Settings,
-  Shield,
-  BarChart3,
-  TrendingUp,
-  CheckCircle,
-  Clock,
-  Plus
-} from 'lucide-react';
+  Users, GraduationCap, UserCheck, TrendingUp, 
+  Search, Filter, Eye, ArrowLeft, AlertCircle,
+  CheckCircle, Calendar, Mail, Phone, MapPin, Award
+} from "lucide-react";
+import { StudentProfile, StudentProfileData } from "@/src/components/shared/StudentProfile";
 
 interface Student {
   uuid: string;
@@ -332,74 +319,16 @@ export default function AdminDashboard() {
             </button>
           </div>
           {filteredStudents.map((student) => (
-            <div key={student.uuid} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {student.first_name?.[0]}{student.last_name?.[0]}
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <h3 className="font-semibold text-lg text-gray-800">
-                      {student.first_name} {student.last_name}
-                    </h3>
-                    <p className="text-sm text-gray-500 truncate">{student.email}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 mb-4">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Level:</span>
-                    <span className="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                      {student.lvl || 'Not set'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Status:</span>
-                    <span className={`font-medium px-2 py-1 rounded-full text-xs ${
-                      student.onboardingcompleted 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-orange-100 text-orange-800'
-                    }`}>
-                      {student.onboardingcompleted ? 'Active' : 'Pending'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Tests:</span>
-                    <span className="font-medium text-gray-800">
-                      {student.tests?.length || 0} completed
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500">Mentor:</span>
-                    <span className={`font-medium px-2 py-1 rounded-full text-xs ${
-                      student.assigned_mentor?.length 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {student.assigned_mentor?.length ? 'Assigned' : 'Unassigned'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => assignMentor(student.uuid)}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    Assign
-                  </button>
-                  <button
-                    onClick={() => allowViewResults(student.uuid)}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
-                  >
-                    <Eye className="h-4 w-4" />
-                    Results
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+                <StudentProfile
+                  key={student.uuid}
+                  student={student as StudentProfileData}
+                  variant="card"
+                  showActions={true}
+                  onAssignMentor={() => window.location.href = '/admin/assign-mentor'}
+                  onEdit={() => console.log('Edit student:', student.uuid)}
+                  onViewHoroscope={() => console.log('View horoscope:', student.uuid)}
+                />
+              ))}
         </div>
 
         {filteredStudents.length === 0 && (
