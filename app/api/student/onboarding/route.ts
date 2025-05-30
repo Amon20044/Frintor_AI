@@ -68,7 +68,10 @@ export async function POST(req: NextRequest) {
     // Process interests into array
     const interestArray = interest ? interest.split(',').map((i: string) => i.trim()) : [];
 
-    // Organize data
+    // Split interests into array
+    const interestArray = interest ? interest.split(',').map(i => i.trim()) : [];
+
+    // Organize data according to JSON structure
     const studentData = {
       uuid: studentIdFromToken,
       first_name,
@@ -91,7 +94,11 @@ export async function POST(req: NextRequest) {
         tenth_marksheet,
         twelfth_marksheet,
         other_certificate,
-        neet_marksheet
+        neet_marksheet,
+        institute,
+        branch,
+        cgpa_cpi,
+        graduation_year
       },
       studentMetadata: {
         permanent_address,
@@ -103,13 +110,18 @@ export async function POST(req: NextRequest) {
           mother_birth_date,
           father_contact,
           mother_contact
+        },
+        professional_experience: {
+          company_name,
+          job_title,
+          experience_years,
+          current_salary
         }
       },
       preferences: {
         preferences,
         career_goals
-      },
-      ...rest
+      }
     };
 
     const result = await onboardStudent(studentData);

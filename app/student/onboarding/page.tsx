@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { onboardingSchema, type OnboardingData } from "@/lib/schemas";
 import { toast } from "sonner";
-import { ArrowRight, User, Calendar, MapPin, GraduationCap, Heart, Home, Phone, Users, Target } from "lucide-react";
+import { ArrowRight, User, Calendar, MapPin, GraduationCap, Heart, Home, Phone, Users, Target, Briefcase, Star } from "lucide-react";
 
 export default function OnboardingPage() {
   const [isPending, setIsPending] = useState(false);
@@ -104,7 +104,7 @@ export default function OnboardingPage() {
                   <input
                     id="first_name"
                     type="text"
-                    placeholder="Manav"
+                    placeholder="Rajesh"
                     {...register("first_name")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
@@ -120,27 +120,12 @@ export default function OnboardingPage() {
                   <input
                     id="last_name"
                     type="text"
-                    placeholder="Mehta"
+                    placeholder="Sharma"
                     {...register("last_name")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
                   {errors.last_name && (
                     <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
-                    Birth Date
-                  </label>
-                  <input
-                    id="dateOfBirth"
-                    type="date"
-                    {...register("dateOfBirth")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                  {errors.dateOfBirth && (
-                    <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth.message}</p>
                   )}
                 </div>
 
@@ -151,7 +136,7 @@ export default function OnboardingPage() {
                   <input
                     id="email"
                     type="email"
-                    placeholder="manavmehta@gmail.com"
+                    placeholder="rajesh.sharma@gmail.com"
                     {...register("email")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
@@ -162,12 +147,12 @@ export default function OnboardingPage() {
 
                 <div>
                   <label htmlFor="mobile_number" className="block text-sm font-medium text-gray-700 mb-2">
-                    Contact No.
+                    Mobile Number
                   </label>
                   <input
                     id="mobile_number"
                     type="tel"
-                    placeholder="+91 9856347345"
+                    placeholder="+91 9876543210"
                     {...register("mobile_number")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
@@ -241,7 +226,7 @@ export default function OnboardingPage() {
                   <textarea
                     id="permanent_address"
                     rows={3}
-                    placeholder="Gandhinagar, Gujarat"
+                    placeholder="123, ABC Society, Ahmedabad, Gujarat - 380001"
                     {...register("permanent_address")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                   />
@@ -255,17 +240,49 @@ export default function OnboardingPage() {
                   <textarea
                     id="current_address"
                     rows={3}
-                    placeholder="Gandhinagar, Gujarat"
+                    placeholder="456, PQR Hostel, Mumbai, Maharashtra - 400001"
                     {...register("current_address")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                   />
                 </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Horoscope Requirements Section */}
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 border-b border-gray-200 pb-3">
+                <Star className="h-6 w-6 text-purple-500" />
+                Horoscope Requirements
+                <span className="text-sm font-normal text-gray-500 ml-2">(Required for Vedic Career Guidance)</span>
+              </h2>
+              
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 mb-6">
+                <p className="text-purple-700 text-sm">
+                  <Star className="h-4 w-4 inline mr-1" />
+                  Your birth details are used to generate a personalized Vedic horoscope for accurate career guidance. This information is kept confidential and secure.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
+                    <Calendar className="h-4 w-4 inline mr-1" />
+                    Date of Birth *
+                  </label>
+                  <input
+                    id="dateOfBirth"
+                    type="date"
+                    {...register("dateOfBirth")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                  {errors.dateOfBirth && (
+                    <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth.message}</p>
+                  )}
+                </div>
+
                 <div>
                   <label htmlFor="timeOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
-                    Time of Birth (Optional)
+                    Time of Birth *
                   </label>
                   <input
                     id="timeOfBirth"
@@ -273,19 +290,26 @@ export default function OnboardingPage() {
                     {...register("timeOfBirth")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
+                  {errors.timeOfBirth && (
+                    <p className="text-red-500 text-sm mt-1">{errors.timeOfBirth.message}</p>
+                  )}
                 </div>
 
                 <div>
                   <label htmlFor="placeOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
-                    Place of Birth
+                    <MapPin className="h-4 w-4 inline mr-1" />
+                    Place of Birth *
                   </label>
                   <input
                     id="placeOfBirth"
                     type="text"
-                    placeholder="City, State, Country"
+                    placeholder="Mumbai, Maharashtra, India"
                     {...register("placeOfBirth")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
+                  {errors.placeOfBirth && (
+                    <p className="text-red-500 text-sm mt-1">{errors.placeOfBirth.message}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -299,64 +323,8 @@ export default function OnboardingPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
-                  <label htmlFor="tenth_percentage" className="block text-sm font-medium text-gray-700 mb-2">
-                    10th Percentage
-                  </label>
-                  <input
-                    id="tenth_percentage"
-                    type="text"
-                    placeholder="80%"
-                    {...register("tenth_percentage")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="twelfth_percentage" className="block text-sm font-medium text-gray-700 mb-2">
-                    12th Percentage
-                  </label>
-                  <input
-                    id="twelfth_percentage"
-                    type="text"
-                    placeholder="71%"
-                    {...register("twelfth_percentage")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="academic_background" className="block text-sm font-medium text-gray-700 mb-2">
-                    Academic Background
-                  </label>
-                  <select
-                    id="academic_background"
-                    {...register("academic_background")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  >
-                    <option value="">Select Background</option>
-                    <option value="Senior Secondary">Senior Secondary</option>
-                    <option value="Science">Science</option>
-                    <option value="Commerce">Commerce</option>
-                    <option value="Arts">Arts</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject
-                  </label>
-                  <input
-                    id="subject"
-                    type="text"
-                    placeholder="Biology"
-                    {...register("subject")}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
-                  />
-                </div>
-
-                <div>
                   <label htmlFor="lvl" className="block text-sm font-medium text-gray-700 mb-2">
-                    Education Level
+                    Education Level *
                   </label>
                   <select
                     id="lvl"
@@ -370,18 +338,129 @@ export default function OnboardingPage() {
                     <option value="POSTGRADUATE">Postgraduate</option>
                     <option value="WORKING_PROFESSIONAL">Working Professional</option>
                   </select>
+                  {errors.lvl && (
+                    <p className="text-red-500 text-sm mt-1">{errors.lvl.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="tenth_percentage" className="block text-sm font-medium text-gray-700 mb-2">
+                    10th Percentage
+                  </label>
+                  <input
+                    id="tenth_percentage"
+                    type="text"
+                    placeholder="85%"
+                    {...register("tenth_percentage")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="twelfth_percentage" className="block text-sm font-medium text-gray-700 mb-2">
+                    12th Percentage
+                  </label>
+                  <input
+                    id="twelfth_percentage"
+                    type="text"
+                    placeholder="78%"
+                    {...register("twelfth_percentage")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="academic_background" className="block text-sm font-medium text-gray-700 mb-2">
+                    Stream/Background
+                  </label>
+                  <select
+                    id="academic_background"
+                    {...register("academic_background")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  >
+                    <option value="">Select Stream</option>
+                    <option value="Science">Science</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Vocational">Vocational</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                    Major Subject
+                  </label>
+                  <input
+                    id="subject"
+                    type="text"
+                    placeholder="Computer Science"
+                    {...register("subject")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="institute" className="block text-sm font-medium text-gray-700 mb-2">
+                    Institute/College
+                  </label>
+                  <input
+                    id="institute"
+                    type="text"
+                    placeholder="IIT Bombay"
+                    {...register("institute")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="branch" className="block text-sm font-medium text-gray-700 mb-2">
+                    Branch/Department
+                  </label>
+                  <input
+                    id="branch"
+                    type="text"
+                    placeholder="Computer Science & Engineering"
+                    {...register("branch")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="cgpa_cpi" className="block text-sm font-medium text-gray-700 mb-2">
+                    CGPA/CPI
+                  </label>
+                  <input
+                    id="cgpa_cpi"
+                    type="text"
+                    placeholder="8.5"
+                    {...register("cgpa_cpi")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="graduation_year" className="block text-sm font-medium text-gray-700 mb-2">
+                    Graduation Year
+                  </label>
+                  <input
+                    id="graduation_year"
+                    type="text"
+                    placeholder="2024"
+                    {...register("graduation_year")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label htmlFor="tenth_marksheet" className="block text-sm font-medium text-gray-700 mb-2">
-                    10th Marksheet Details
+                    10th Details
                   </label>
                   <textarea
                     id="tenth_marksheet"
                     rows={3}
-                    placeholder="Board, Year, Marks, etc."
+                    placeholder="Board: CBSE, Year: 2020, Marks: 85%"
                     {...register("tenth_marksheet")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                   />
@@ -389,12 +468,12 @@ export default function OnboardingPage() {
 
                 <div>
                   <label htmlFor="twelfth_marksheet" className="block text-sm font-medium text-gray-700 mb-2">
-                    12th Marksheet Details
+                    12th Details
                   </label>
                   <textarea
                     id="twelfth_marksheet"
                     rows={3}
-                    placeholder="Board, Year, Marks, etc."
+                    placeholder="Board: CBSE, Year: 2022, Marks: 78%"
                     {...register("twelfth_marksheet")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                   />
@@ -402,12 +481,12 @@ export default function OnboardingPage() {
 
                 <div>
                   <label htmlFor="other_certificate" className="block text-sm font-medium text-gray-700 mb-2">
-                    Other Certificate
+                    Other Certificates
                   </label>
                   <textarea
                     id="other_certificate"
                     rows={3}
-                    placeholder="Any additional certificates"
+                    placeholder="Olympiad Gold Medal, Coding Competition Winner"
                     {...register("other_certificate")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                   />
@@ -415,14 +494,77 @@ export default function OnboardingPage() {
 
                 <div>
                   <label htmlFor="neet_marksheet" className="block text-sm font-medium text-gray-700 mb-2">
-                    Competitive Exam Details
+                    Competitive Exams
                   </label>
                   <textarea
                     id="neet_marksheet"
                     rows={3}
-                    placeholder="NEET/JEE/Other exam details"
+                    placeholder="JEE Main: 98 percentile, JEE Advanced: AIR 1234"
                     {...register("neet_marksheet")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Professional Experience Section (Optional) */}
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 border-b border-gray-200 pb-3">
+                <Briefcase className="h-6 w-6 text-purple-500" />
+                Professional Experience
+                <span className="text-sm font-normal text-gray-500 ml-2">(Optional - For Working Professionals)</span>
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-2">
+                    Company Name
+                  </label>
+                  <input
+                    id="company_name"
+                    type="text"
+                    placeholder="Google India"
+                    {...register("company_name")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="job_title" className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Title/Position
+                  </label>
+                  <input
+                    id="job_title"
+                    type="text"
+                    placeholder="Software Engineer"
+                    {...register("job_title")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="experience_years" className="block text-sm font-medium text-gray-700 mb-2">
+                    Years of Experience
+                  </label>
+                  <input
+                    id="experience_years"
+                    type="text"
+                    placeholder="2.5 years"
+                    {...register("experience_years")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="current_salary" className="block text-sm font-medium text-gray-700 mb-2">
+                    Current Salary (LPA)
+                  </label>
+                  <input
+                    id="current_salary"
+                    type="text"
+                    placeholder="12 LPA"
+                    {...register("current_salary")}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
                 </div>
               </div>
@@ -443,7 +585,7 @@ export default function OnboardingPage() {
                   <textarea
                     id="preferences"
                     rows={4}
-                    placeholder="Budget, Location, Scholarship preferences..."
+                    placeholder="Budget: 10-15 LPA, Location: Bangalore/Mumbai, Scholarship: Merit-based, Work Environment: Startup/Corporate"
                     {...register("preferences")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                   />
@@ -452,15 +594,18 @@ export default function OnboardingPage() {
                 <div>
                   <label htmlFor="interest" className="block text-sm font-medium text-gray-700 mb-2">
                     <Heart className="h-4 w-4 inline mr-1" />
-                    Interests
+                    Interests *
                   </label>
                   <textarea
                     id="interest"
                     rows={4}
-                    placeholder="Biology, Leadership, Technology, Arts..."
+                    placeholder="Programming, Machine Learning, Data Science, Leadership, Music, Photography, Sports"
                     {...register("interest")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                   />
+                  {errors.interest && (
+                    <p className="text-red-500 text-sm mt-1">{errors.interest.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -471,7 +616,7 @@ export default function OnboardingPage() {
                 <textarea
                   id="career_goals"
                   rows={3}
-                  placeholder="Doctor (MBBS), Engineer, etc."
+                  placeholder="Become a Senior Software Engineer at FAANG company, Start my own tech company, Pursue higher studies in AI/ML"
                   {...register("career_goals")}
                   className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200 resize-none"
                 />
@@ -485,7 +630,7 @@ export default function OnboardingPage() {
                 Parent's Details
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="father_name" className="block text-sm font-medium text-gray-700 mb-2">
                     Father's Name
@@ -493,7 +638,7 @@ export default function OnboardingPage() {
                   <input
                     id="father_name"
                     type="text"
-                    placeholder="Arun Mehta"
+                    placeholder="Suresh Kumar Sharma"
                     {...register("father_name")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
@@ -506,7 +651,7 @@ export default function OnboardingPage() {
                   <input
                     id="mother_name"
                     type="text"
-                    placeholder="Jaimini Mehta"
+                    placeholder="Priya Sharma"
                     {...register("mother_name")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
@@ -544,7 +689,7 @@ export default function OnboardingPage() {
                   <input
                     id="father_contact"
                     type="tel"
-                    placeholder="+91 9856347345"
+                    placeholder="+91 9876543210"
                     {...register("father_contact")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />
@@ -558,7 +703,7 @@ export default function OnboardingPage() {
                   <input
                     id="mother_contact"
                     type="tel"
-                    placeholder="+91 9856347345"
+                    placeholder="+91 9876543210"
                     {...register("mother_contact")}
                     className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-500 bg-white transition-all duration-200"
                   />

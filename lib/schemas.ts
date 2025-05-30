@@ -30,14 +30,16 @@ export const onboardingSchema = z.object({
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
     required_error: "Gender is required",
   }),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  timeOfBirth: z.string().optional(),
-  placeOfBirth: z.string().min(1, "Place of birth is required"),
   email: z.string().optional(),
   mobile_number: z.string().optional(),
   category: z.string().optional(),
   permanent_address: z.string().optional(),
   current_address: z.string().optional(),
+
+  // Horoscope Requirements
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  timeOfBirth: z.string().min(1, "Time of birth is required for horoscope"),
+  placeOfBirth: z.string().min(1, "Place of birth is required"),
 
   // Academic Details
   lvl: z.enum(["MID_SCHOOL", "HIGH_SCHOOL", "UNDERGRADUATE", "POSTGRADUATE", "WORKING_PROFESSIONAL"], {
@@ -51,6 +53,17 @@ export const onboardingSchema = z.object({
   twelfth_marksheet: z.string().optional(),
   other_certificate: z.string().optional(),
   neet_marksheet: z.string().optional(),
+  // Optional Academic Fields
+  institute: z.string().optional(),
+  branch: z.string().optional(),
+  cgpa_cpi: z.string().optional(),
+  graduation_year: z.string().optional(),
+
+  // Professional Section (Optional)
+  company_name: z.string().optional(),
+  job_title: z.string().optional(),
+  experience_years: z.string().optional(),
+  current_salary: z.string().optional(),
 
   // Preferences & Interests
   interest: z.string().min(1, "Interests are required"),
