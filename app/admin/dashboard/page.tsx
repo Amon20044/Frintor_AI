@@ -69,7 +69,7 @@ export default function AdminDashboard() {
 
   const fetchAdminProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       if (!token) {
         window.location.href = '/admin/auth';
         return;
