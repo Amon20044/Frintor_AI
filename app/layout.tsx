@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Bricolage_Grotesque} from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
-import React from "react";
 
 const geistSans = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -21,62 +20,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {children}
         <Toaster/>
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
       </body>
     </html>
   );
-}
-
-function ErrorBoundary({ children }: { children: React.ReactNode }) {
-  const [hasError, setHasError] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleError = (error: ErrorEvent) => {
-      console.error('Global error:', error);
-      setHasError(true);
-    };
-
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('Unhandled promise rejection:', event.reason);
-      setHasError(true);
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
-  }, []);
-
-  if (hasError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Application Error</h2>
-          <p className="text-gray-600 mb-4">Something went wrong. Please check the browser console for details.</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Reload Page
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
 }
