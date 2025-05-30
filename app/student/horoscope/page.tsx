@@ -5,6 +5,17 @@ import VedicHoroscopeAnalysis from "@/components/VedicHoroscope";
 import { Loader2 } from 'lucide-react';
 
 function Page() {
+  const [uuid, setUuid] = useState<string>('');
+
+  useEffect(() => {
+    // Get UUID from localStorage
+    const studentUuid = localStorage.getItem('uuid');
+    if (studentUuid) {
+      setUuid(studentUuid);
+    }
+  }, []);
+
+function Page() {
   const [uuid, setUuid] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
