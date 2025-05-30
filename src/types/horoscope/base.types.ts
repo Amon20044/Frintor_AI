@@ -1,4 +1,6 @@
 
+import { CareerPath } from './career.types';
+
 // Forward declarations
 export interface PlanetaryInfluence {
   house: HouseNumber;
