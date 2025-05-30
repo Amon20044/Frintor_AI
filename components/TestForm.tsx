@@ -12,7 +12,12 @@ interface Question {
   userResponse?: string;
 }
 
-export default function TestForm({ params }: { params: { uuid: string } }) {
+interface TestFormProps {
+  params?: { uuid: string };
+  onTestComplete?: () => void;
+}
+
+export default function TestForm({ params, onTestComplete }: TestFormProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [testId, setTestId] = useState('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -25,7 +30,12 @@ export default function TestForm({ params }: { params: { uuid: string } }) {
     const fetchTest = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`api/student/getTest/${params.uuid}`, {
+        const studentUuid = params?.uuid || localStorage.getItem('uuid');
+        if (!studentUuid) {
+          throw new Error('No student UUID found');
+        }
+        
+        const res = await fetch(`api/student/getTest/${studentUuid}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -49,7 +59,7 @@ export default function TestForm({ params }: { params: { uuid: string } }) {
     };
 
     fetchTest();
-  }, [params.uuid]);
+  }, [params?.uuid]);
 
   const handleOptionChange = (selectedOption: string) => {
     setQuestions((prev) =>
@@ -114,7 +124,11 @@ export default function TestForm({ params }: { params: { uuid: string } }) {
 
       if (res.ok) {
         alert('Test submitted successfully!');
-        router.push('/thank-you');
+        if (onTestComplete) {
+          onTestComplete();
+        } else {
+          router.push('/student/dashboard');
+        }
       } else {
         console.error('Submission failed:', data);
         alert('Failed to submit test.');
