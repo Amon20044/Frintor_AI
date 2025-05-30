@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -46,12 +47,22 @@ export default function AdminDashboard() {
     activeMentorships: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
-    fetchAdminProfile();
-    fetchDashboardData();
+    const initializeDashboard = async () => {
+      try {
+        await fetchAdminProfile();
+        await fetchDashboardData();
+      } catch (err) {
+        console.error('Dashboard initialization error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to initialize dashboard');
+      }
+    };
+
+    initializeDashboard();
   }, []);
 
   const fetchAdminProfile = async () => {
@@ -73,32 +84,49 @@ export default function AdminDashboard() {
         setAdmin(data.admin);
         toast.success(`Welcome ${data.admin.name}! Ready to manage your platform?`);
       } else {
-        window.location.href = '/admin/auth';
+        throw new Error(`Failed to fetch profile: ${response.status}`);
       }
     } catch (error) {
       console.error('Error fetching admin profile:', error);
-      window.location.href = '/admin/auth';
+      throw error;
     }
   };
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch students
-      const studentsRes = await fetch('/api/admin/students');
-      if (studentsRes.ok) {
-        const studentsData = await studentsRes.json();
-        setStudents(studentsData.students);
+      // Fetch students with error handling
+      try {
+        const studentsRes = await fetch('/api/admin/students');
+        if (studentsRes.ok) {
+          const studentsData = await studentsRes.json();
+          setStudents(studentsData.students || []);
+        } else {
+          console.error('Failed to fetch students:', studentsRes.status);
+        }
+      } catch (err) {
+        console.error('Students fetch error:', err);
       }
 
-      // Fetch stats
-      const statsRes = await fetch('/api/admin/dashboard-stats');
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStats(statsData.stats);
+      // Fetch stats with error handling
+      try {
+        const statsRes = await fetch('/api/admin/dashboard-stats');
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setStats(statsData.stats || {
+            totalStudents: 0,
+            totalMentors: 0,
+            completedTests: 0,
+            activeMentorships: 0
+          });
+        } else {
+          console.error('Failed to fetch stats:', statsRes.status);
+        }
+      } catch (err) {
+        console.error('Stats fetch error:', err);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -140,6 +168,24 @@ export default function AdminDashboard() {
     return matchesSearch && matchesFilter;
   });
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-red-100 to-red-200 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md">
+          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Dashboard Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
@@ -169,7 +215,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-2 text-gray-600">
                 <Shield className="h-4 w-4" />
-                <span className="text-sm">{admin?.name}</span>
+                <span className="text-sm">{admin?.name || 'Admin'}</span>
               </div>
               <button className="p-2 hover:bg-gray-100 rounded-lg">
                 <Bell className="h-5 w-5 text-gray-600" />
@@ -191,7 +237,7 @@ export default function AdminDashboard() {
                 <Shield className="h-8 w-8" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold">Welcome {admin?.name}!</h2>
+                <h2 className="text-3xl font-bold">Welcome {admin?.name || 'Admin'}!</h2>
                 <p className="text-orange-100">Manage your platform and oversee all operations</p>
               </div>
             </div>
