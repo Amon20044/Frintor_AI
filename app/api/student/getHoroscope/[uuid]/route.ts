@@ -2,14 +2,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHoroscope } from '@/models/horoscopeModel'; // adjust if your function is in another path
 import { verifyToken } from "@/middleware/authMiddleware";
-export async function GET(req: NextRequest, { params }: { params: { uuid: string } }) {
+import supabase from '@/database/db';
+export async function GET(req: NextRequest) {
   try {
-    console.log("Received request for horoscope with UUID:", params.uuid);
+    const studentId = req.nextUrl.pathname.split('/').pop(); // Extract UUID from the URL
+  
+    console.log("Received request for horoscope with UUID:", studentId);
 
     const { data: horoscope, error } = await supabase
       .from("ai_horoscope")
       .select("*")
-      .eq("student_id", params.uuid)
+      .eq("student_id", studentId)
       .single();
 
     if (error) {
