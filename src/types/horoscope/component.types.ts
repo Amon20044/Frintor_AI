@@ -45,3 +45,25 @@ export interface CollegeCardProps {
   showFullDetails?: boolean;
   customActions?: React.ReactNode;
 }
+
+// Zodiac icon mapping
+export interface ZodiacIconMap {
+  [key in ZodiacSign]: string;
+}
+
+export const DEFAULT_ZODIAC_ICONS: ZodiacIconMap = {
+  'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊', 'Cancer': '♋',
+  'Leo': '♌', 'Virgo': '♍', 'Libra': '♎', 'Scorpio': '♏',
+  'Sagittarius': '♐', 'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓'
+};
+
+// Planet icon mapping
+export interface PlanetIconMap {
+  [key in Planet]: string;
+}
+
+export const DEFAULT_PLANET_ICONS: PlanetIconMap = {
+  'Sun': '☉', 'Moon': '☽', 'Mars': '♂', 'Mercury': '☿', 
+  'Jupiter': '♃', 'Venus': '♀', 'Saturn': '♄',
+  'Rahu': '☊', 'Ketu': '☋', 'Uranus': '♅', 'Neptune': '♆', 'Pluto': '♇'
+};
