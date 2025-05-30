@@ -22,6 +22,8 @@ export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisP
   const { horoscopeData, loading, error, refetch } = useHoroscope(uuid);
   const { selectedCareer, setSelectedCareer, expandedSections, toggleSection } = useHoroscopeState();
 
+  console.log('VedicHoroscopeAnalysis render:', { uuid, loading, error, horoscopeData });
+
   // Loading state
   if (loading) {
     return <LoadingState />;
@@ -29,10 +31,14 @@ export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisP
 
   // Error state
   if (error) {
+    console.error('VedicHoroscope error:', error);
     return <ErrorState error={error} onRetry={refetch} />;
   }
 
-  if (!horoscopeData) return null;
+  if (!horoscopeData) {
+    console.warn('No horoscope data available');
+    return <ErrorState error="No horoscope data found" onRetry={refetch} />;
+  }
 
   // Initialize selected career if not set
   if (!selectedCareer && horoscopeData.suggested_colleges?.[0]?.career) {

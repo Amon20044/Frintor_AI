@@ -12,21 +12,30 @@ export const useHoroscope = (uuid?: string) => {
   useEffect(() => {
     const fetchHoroscope = async () => {
       if (!uuid) {
+        console.warn('No UUID provided, using sample data');
         // Use sample data if no UUID provided
         setHoroscopeData(SAMPLE_HOROSCOPE_DATA);
         setLoading(false);
         return;
       }
 
+      console.log('Fetching horoscope for UUID:', uuid);
+
       try {
         setLoading(true);
         setError(null);
         const data = await HoroscopeService.getHoroscope(uuid);
+        console.log('Horoscope data received:', data);
         setHoroscopeData(data);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch horoscope';
-        setError(errorMessage);
         console.error('Horoscope fetch error:', err);
+        setError(errorMessage);
+        
+        // If it's a verification error, provide more specific message
+        if (errorMessage.includes('verification') || errorMessage.includes('pending')) {
+          setError('Your horoscope is pending mentor verification. Please wait for your mentor to verify it.');
+        }
       } finally {
         setLoading(false);
       }

@@ -86,11 +86,11 @@ export default function MentorDashboard() {
     }
   };
 
-  const fetchAssignedStudents = async (mentorId: string) => {
+  const fetchAssignedStudents = async (mentorUuid: string) => {
     try {
-      const res = await fetch(`/api/mentor/students/${mentorId}`, {
+      const res = await fetch(`/api/mentor/students/${mentorUuid}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('mentorToken')}`
         }
       });
 

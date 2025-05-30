@@ -3,11 +3,18 @@ import { HoroscopeData } from '@/src/types/horoscope';
 
 export class HoroscopeService {
   private static async makeRequest(url: string, options: RequestInit = {}) {
+    // Try to get the appropriate token based on current context
+    const studentToken = localStorage.getItem('token');
+    const mentorToken = localStorage.getItem('mentorToken');
+    const adminToken = localStorage.getItem('adminToken');
+    
+    const token = studentToken || mentorToken || adminToken;
+    
     const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        'authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+        'authorization': `Bearer ${token || ''}`,
         ...options.headers,
       },
     });
