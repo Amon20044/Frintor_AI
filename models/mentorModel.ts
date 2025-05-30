@@ -164,3 +164,21 @@ export const getMentorStudents = async (mentorId: string) => {
 
   return data;
 };
+
+export const updateMeetingStatus = async (assignmentId: string, meetingStatus: string) => {
+  const { data, error } = await supabase
+    .from('assigned_mentor')
+    .update({ 
+      meeting_status: meetingStatus,
+      updated_at: new Date().toISOString()
+    })
+    .eq('uuid', assignmentId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
