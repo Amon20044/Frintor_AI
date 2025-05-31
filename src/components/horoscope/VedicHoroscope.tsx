@@ -1,4 +1,3 @@
-
 "use client"
 import React from 'react';
 import { 
@@ -19,9 +18,21 @@ import { ErrorState } from './ErrorState';
 import { CollegeCard } from './CollegeCard';
 
 export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisProps) {
-  let { horoscopeData , loading, error, refetch } = useHoroscope(uuid);
+  const { horoscopeData: rawHoroscopeData, loading, error, refetch } = useHoroscope(uuid);
   const { selectedCareer, setSelectedCareer, expandedSections, toggleSection } = useHoroscopeState();
-  horoscopeData = horoscopeData.horoscope[0] || horoscopeData; // Ensure we are working with the first horoscope object
+  
+  // Safely extract horoscope data with proper type checking
+  let horoscopeData = null;
+  if (rawHoroscopeData) {
+    // Check if rawHoroscopeData has a horoscope property with array
+    if ('horoscope' in rawHoroscopeData && Array.isArray(rawHoroscopeData.horoscope) && rawHoroscopeData.horoscope.length > 0) {
+      horoscopeData = rawHoroscopeData.horoscope[0];
+    } else {
+      // Otherwise use the raw data directly
+      horoscopeData = rawHoroscopeData;
+    }
+  }
+
   // Loading state
   if (loading) {
     return <LoadingState />;
@@ -31,7 +42,10 @@ export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisP
   if (error) {
     return <ErrorState error={error} onRetry={refetch} />;
   }
-  console.log('Horoscope Data:----------------------------', horoscopeData);
+  
+  console.log('Raw Horoscope Data:', rawHoroscopeData);
+  console.log('Processed Horoscope Data:', horoscopeData);
+  
   if (!horoscopeData) return null;
 
   // Initialize selected career if not set
