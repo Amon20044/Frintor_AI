@@ -1,4 +1,5 @@
 
+"use client"
 import { useState, useEffect } from 'react';
 import { HoroscopeData } from '@/src/types/horoscope';
 import { HoroscopeService } from '@/src/services/horoscope.service';

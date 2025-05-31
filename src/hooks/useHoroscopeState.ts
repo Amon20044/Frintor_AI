@@ -1,4 +1,4 @@
-
+"use client"
 import { useState } from 'react';
 import { ExpandedSections } from '@/src/types/horoscope';
 

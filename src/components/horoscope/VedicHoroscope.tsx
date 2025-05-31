@@ -19,11 +19,9 @@ import { ErrorState } from './ErrorState';
 import { CollegeCard } from './CollegeCard';
 
 export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisProps) {
-  const { horoscopeData, loading, error, refetch } = useHoroscope(uuid);
+  let { horoscopeData , loading, error, refetch } = useHoroscope(uuid);
   const { selectedCareer, setSelectedCareer, expandedSections, toggleSection } = useHoroscopeState();
-
-  console.log('VedicHoroscopeAnalysis render:', { uuid, loading, error, horoscopeData });
-  console.log('Selected Career:', horoscopeData);
+  horoscopeData = horoscopeData.horoscope[0] || horoscopeData; // Ensure we are working with the first horoscope object
   // Loading state
   if (loading) {
     return <LoadingState />;
@@ -31,14 +29,10 @@ export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisP
 
   // Error state
   if (error) {
-    console.error('VedicHoroscope error:', error);
     return <ErrorState error={error} onRetry={refetch} />;
   }
-
-  if (!horoscopeData) {
-    console.warn('No horoscope data available');
-    return <ErrorState error="No horoscope data found" onRetry={refetch} />;
-  }
+  console.log('Horoscope Data:----------------------------', horoscopeData);
+  if (!horoscopeData) return null;
 
   // Initialize selected career if not set
   if (!selectedCareer && horoscopeData.suggested_colleges?.[0]?.career) {
