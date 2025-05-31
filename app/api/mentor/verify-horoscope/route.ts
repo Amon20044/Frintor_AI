@@ -32,10 +32,11 @@ export async function POST(req: NextRequest) {
     // Update horoscope verification status
     const { data, error } = await supabase
       .from('ai_horoscope')
-      .update({ verfied: true })
+      .update({ verified: true })
       .eq('student_id', studentId)
-      .select()
-      .single();
+      .order('generated_at', { ascending: false }) // or use 'id' if no timestamp
+      .limit(1)
+      .maybeSingle(); // avoids error if no row
 
     if (error) {
       console.error('Error verifying horoscope:', error.message);

@@ -23,10 +23,8 @@ export async function GET(req: NextRequest) {
         { success: false, message: "Horoscope not found" },
         { status: 404 }
       );
-    }
-
-    // Check if horoscope is verified by mentor
-    if (!horoscope.verfied) {
+    }    // Check if horoscope is verified by mentor
+    if (!horoscope.verified) {
       return NextResponse.json(
         { success: false, message: "Horoscope pending mentor verification" },
         { status: 403 }

@@ -7,39 +7,37 @@ export async function GET(
 ) {
   try {
     const studentId = req.nextUrl.pathname.split('/').pop(); // Extract UUID from the URL
-    
+
     if (!studentId) {
       return NextResponse.json(
         { success: false, message: "Student ID is required" },
         { status: 400 }
       );
-    }
-
-    // Check if horoscope exists and verification status
+    }    // Check if horoscope exists and verification status
     const { data: horoscope, error } = await supabase
       .from('ai_horoscope')
-      .select('uuid, verfied')
+      .select('uuid, verified') // Note: database column name is 'verfied' 
       .eq('student_id', studentId)
-      .single();
+      .order('generated_at', { ascending: false }) // or use 'id'
+      .limit(1)
+      .maybeSingle();
 
     if (error) {
       console.log('No horoscope found:', error.message);
       return NextResponse.json(
-        { 
-          success: true, 
-          status: { exists: false, verified: false } 
+        {
+          success: true,
+          status: { exists: false, verified: false }
         },
         { status: 200 }
       );
-    }
-
-    return NextResponse.json(
-      { 
-        success: true, 
-        status: { 
-          exists: true, 
-          verified: horoscope.verfied || false 
-        } 
+    }    return NextResponse.json(
+      {
+        success: true,
+        status: {
+          exists: true,
+          verified: horoscope.verified || false
+        }
       },
       { status: 200 }
     );

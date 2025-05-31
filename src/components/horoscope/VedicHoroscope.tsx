@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   User, Star, Brain, Target, BookOpen, Building, MapPin, Globe, 
   DollarSign, GraduationCap, ExternalLink, ChevronDown, ChevronUp,
@@ -20,9 +20,38 @@ import { CollegeCard } from './CollegeCard';
 export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisProps) {
   const { horoscopeData: rawHoroscopeData, loading, error, refetch } = useHoroscope(uuid);
   const { selectedCareer, setSelectedCareer, expandedSections, toggleSection } = useHoroscopeState();
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Function to trigger background horoscope generation
+  const triggerHoroscopeGeneration = async (studentId: string) => {
+    try {
+      setIsGenerating(true);
+      console.log(`🔄 Triggering horoscope generation for ${studentId}`);
+      
+      const endpoint = `https://frintor-ai-487976053532.asia-south1.run.app/horoscope/${studentId}`;
+      
+      await fetch(endpoint, {
+        method: "POST",
+      });
+      
+      console.log(`✅ Background task started for ${studentId}`);
+      
+      // Poll for data after a delay
+      setTimeout(() => {
+        refetch();
+      }, 5000); // Wait 5 seconds before refetching
+      
+    } catch (err) {
+      console.error(`❌ Failed to trigger background task:`, err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
   
   // Safely extract horoscope data with proper type checking
   let horoscopeData = null;
+  let isDataEmpty = false;
+  
   if (rawHoroscopeData) {
     // Check if rawHoroscopeData has a horoscope property with array
     if ('horoscope' in rawHoroscopeData && Array.isArray(rawHoroscopeData.horoscope) && rawHoroscopeData.horoscope.length > 0) {
@@ -31,10 +60,33 @@ export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisP
       // Otherwise use the raw data directly
       horoscopeData = rawHoroscopeData;
     }
+    
+    // Check if data is effectively empty
+    if (horoscopeData && typeof horoscopeData === 'object') {
+      const hasMeaningfulData = 
+        horoscopeData.zodiac_sign || 
+        horoscopeData.personality_summary || 
+        (horoscopeData.suggested_colleges && horoscopeData.suggested_colleges.length > 0) ||
+        (horoscopeData.traits_analyzed && horoscopeData.traits_analyzed.length > 0);
+      
+      isDataEmpty = !hasMeaningfulData;
+    } else {
+      isDataEmpty = true;
+    }
+  } else {
+    isDataEmpty = true;
   }
 
+  // Trigger background generation if data is empty (but no error)
+  useEffect(() => {
+    if (!loading && !error && isDataEmpty && uuid && !isGenerating) {
+      console.log('🔍 Horoscope data is empty, triggering background generation...');
+      triggerHoroscopeGeneration(uuid);
+    }
+  }, [loading, error, isDataEmpty, uuid, isGenerating]);
+
   // Loading state
-  if (loading) {
+  if (loading || isGenerating) {
     return <LoadingState />;
   }
 
@@ -45,6 +97,30 @@ export default function VedicHoroscopeAnalysis({ uuid }: VedicHoroscopeAnalysisP
   
   console.log('Raw Horoscope Data:', rawHoroscopeData);
   console.log('Processed Horoscope Data:', horoscopeData);
+  console.log('Is Data Empty:', isDataEmpty);
+  
+  // Show generation in progress state
+  if (isDataEmpty) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-blue-100 max-w-md">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4" />
+          <h3 className="text-2xl font-semibold text-gray-900 mb-3">Generating Your Horoscope</h3>
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            Our cosmic algorithms are analyzing your birth chart and creating personalized insights. 
+            This may take a few moments...
+          </p>
+          <button 
+            onClick={() => refetch()}
+            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 font-medium"
+          >
+            <Star className="h-4 w-4" />
+            Check Progress
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   if (!horoscopeData) return null;
 
