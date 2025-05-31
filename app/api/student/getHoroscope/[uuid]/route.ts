@@ -6,13 +6,15 @@ import supabase from '@/database/db';
 export async function GET(req: NextRequest) {
   try {
     const studentId = req.nextUrl.pathname.split('/').pop(); // Extract UUID from the URL
-  
+
     console.log("Received request for horoscope with UUID:", studentId);
 
     const { data: horoscope, error } = await supabase
       .from("ai_horoscope")
       .select("*")
       .eq("student_id", studentId)
+      .order("generated_at", { ascending: false }) // sort latest first
+      .limit(1)
       .single();
 
     if (error) {
