@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       .eq("student_id", studentId)
       .order("generated_at", { ascending: false }) // sort latest first
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("Error fetching horoscope:", error.message);
